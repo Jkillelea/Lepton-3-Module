@@ -1,0 +1,3 @@
+[submodule "software/raspberrypi_libs/lepton-sdk-fork"]
+	path = software/raspberrypi_libs/lepton-sdk-fork
+	url = https://github.com/Jkillelea/lepton-sdk-fork

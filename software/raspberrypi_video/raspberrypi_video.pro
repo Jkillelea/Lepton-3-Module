@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = 
 
 RPI_LIBS = ../raspberrypi_libs
-LEPTONSDK = leptonSDKEmb32PUB
+LEPTONSDK = lepton-sdk-fork
 
 PRE_TARGETDEPS += sdk
 QMAKE_EXTRA_TARGETS += sdk sdkclean

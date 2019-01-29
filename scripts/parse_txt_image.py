@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import numpy
+import matplotlib.pyplot as plt
 import sys
 
 WIDTH = 160
@@ -20,3 +21,11 @@ with open(filename, "r") as f:
         row += 1
 
 print(data)
+
+fig = plt.figure()
+
+ax = fig.add_subplot(111)
+
+plt.imshow(data)
+plt.show()
+

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "Lepton_I2C.h"
-#include "leptonSDKEmb32PUB/LEPTON_SDK.h"
-#include "leptonSDKEmb32PUB/LEPTON_SYS.h"
-#include "leptonSDKEmb32PUB/LEPTON_Types.h"
-#include "leptonSDKEmb32PUB/LEPTON_AGC.h"
-#include "leptonSDKEmb32PUB/LEPTON_OEM.h"
+#include "lepton-sdk-fork/LEPTON_SDK.h"
+#include "lepton-sdk-fork/LEPTON_SYS.h"
+#include "lepton-sdk-fork/LEPTON_Types.h"
+#include "lepton-sdk-fork/LEPTON_AGC.h"
+#include "lepton-sdk-fork/LEPTON_OEM.h"
+
 bool _connected;
 
 LEP_CAMERA_PORT_DESC_T _port;

@@ -9,9 +9,9 @@
 #define WIDTH  (160)
 #define HEIGHT (120)
 static const char *device = "/dev/spidev0.0";
-uint8_t mode;
+uint8_t mode = SPI_MODE_3;
 static uint8_t bits = 8;
-static uint32_t speed = 32000000;
+static uint32_t speed = 20000000;
 int snapshotCount = 0;
 int frame = 0;
 static int raw [HEIGHT][WIDTH];
@@ -30,7 +30,9 @@ LeptonThread::~LeptonThread() {
 
 void LeptonThread::run() {
 	// create the initial image
-	QRgb red = qRgb(255,0,0);
+	int ret = 0;
+	int fd;
+	QRgb red = qRgb(255, 0, 0);
 	myImage = QImage(WIDTH, HEIGHT, QImage::Format_RGB888);
 
 	for(int i = 0; i < WIDTH; i++) {
@@ -39,50 +41,33 @@ void LeptonThread::run() {
 		}
 	}
 
-	int ret = 0;
-	int fd;
-
 	fd = open(device, O_RDWR);
 	if (fd < 0)
-	{
 		pabort("can't open device");
-	}
 
 	ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
 	if (ret == -1)
-	{
 		pabort("can't set spi mode");
-	}
 
 	ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
 	if (ret == -1)
-	{
 		pabort("can't get spi mode");
-	}
 
 	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
 	if (ret == -1)
-	{
 		pabort("can't set bits per word");
-	}
 
 	ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
 	if (ret == -1)
-	{
 		pabort("can't get bits per word");
-	}
 
 	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
 	if (ret == -1)
-	{
 		pabort("can't set max speed hz");
-	}
 
 	ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
 	if (ret == -1)
-	{
 		pabort("can't get max speed hz");
-	}
 
 
 	//open spi port
@@ -236,8 +221,8 @@ void LeptonThread::snapshot(){
 	FILE *arq = fopen(name,"wt");
 	char values[64];
 
-	for(int i = 0; i < 120; i++){
-			for(int j = 0; j < 160; j++){
+	for(int i = 0; i < HEIGHT; i++){
+			for(int j = 0; j < WIDTH; j++){
 				sprintf(values, "%f", raw2Celsius(raw[i][j]));
 				fputs(values, arq);
 				fputs(" ", arq);

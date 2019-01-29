@@ -6,37 +6,39 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define WIDTH  (160)
+#define HEIGHT (120)
 static const char *device = "/dev/spidev0.0";
 uint8_t mode;
 static uint8_t bits = 8;
 static uint32_t speed = 32000000;
 int snapshotCount = 0;
 int frame = 0;
-static int raw [120][160];
-static void pabort(const char *s)
-{
+static int raw [HEIGHT][WIDTH];
+
+static void pabort(const char *s) {
 	perror(s);
 	abort();
 }
 
-LeptonThread::LeptonThread() : QThread()
-{
-SpiOpenPort(0);
+LeptonThread::LeptonThread() : QThread() {
+    SpiOpenPort(0);
 }
 
 LeptonThread::~LeptonThread() {
 }
 
-void LeptonThread::run()
-{
-	//create the initial image
+void LeptonThread::run() {
+	// create the initial image
 	QRgb red = qRgb(255,0,0);
-	myImage = QImage(160, 120, QImage::Format_RGB888);
-	for(int i=0;i<160;i++) {
-		for(int j=0;j<120;j++) {
+	myImage = QImage(WIDTH, HEIGHT, QImage::Format_RGB888);
+
+	for(int i = 0; i < WIDTH; i++) {
+		for(int j = 0; j < HEIGHT; j++) {
 			myImage.setPixel(i, j, red);
 		}
 	}
+
 	int ret = 0;
 	int fd;
 

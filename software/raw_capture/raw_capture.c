@@ -120,7 +120,6 @@ int spi_transfer(int fd) {
         for(i = 0; i < IMAGE_WIDTH; i++) {
             image[frame_number][i] = (lepton_frame_packet[2*i + 4] << 8 
                                       | lepton_frame_packet[2*i + 5]);
-            fprintf(stderr, "%d\n", 2*i + 4);
         }
 	}
 

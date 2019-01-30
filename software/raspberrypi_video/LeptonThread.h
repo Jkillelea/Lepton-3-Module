@@ -14,6 +14,9 @@
 #include <cstdlib>
 
 
+#define WIDTH  (160)
+#define HEIGHT (120)
+
 #define PACKET_SIZE 164  //Bytes
 #define PACKET_SIZE_UINT16 (PACKET_SIZE/2)   
 #define NUMBER_OF_SEGMENTS 4

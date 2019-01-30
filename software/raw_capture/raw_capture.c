@@ -14,7 +14,7 @@
 
 #define IMAGE_WIDTH (160)
 #define IMAGE_HEIGHT (120)
-#define FRAME_SIZE (2*IMAGE_WIDTH + 4)
+#define FRAME_SIZE (2*IMAGE_WIDTH + 10)
 
 uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
 
@@ -81,8 +81,6 @@ int open_spi_port(const char *path) {
 }
 
 int spi_transfer(int fd) {
-    fprintf(stderr, "spi_transfer\n");
-
 	int ret;
     int frame_number = -1;
 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
@@ -90,8 +88,8 @@ int spi_transfer(int fd) {
 	uint16_t delay = 0;
 
 	struct spi_ioc_transfer tr = {
-		.tx_buf = (unsigned long)tx,
-		.rx_buf = (unsigned long)lepton_frame_packet,
+		.tx_buf = (unsigned long) tx,
+		.rx_buf = (unsigned long) lepton_frame_packet,
 		.len = FRAME_SIZE,
 		.delay_usecs = delay,
 		.speed_hz = spi_speed,

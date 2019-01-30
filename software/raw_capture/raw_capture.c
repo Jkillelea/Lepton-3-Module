@@ -31,23 +31,6 @@ static void pabort(const char *s) {
 	abort();
 }
 
-// int set_i2c_number(const char *arg) {
-//     int i2c_number = atoi(arg);
-//     switch (i2c_number) { // I2C bus number
-//         case 0:
-//             strcpy(i2c_path, "/dev/i2c-0");
-//             break;
-//         case 1:
-//             strcpy(i2c_path, "/dev/i2c-1");
-//             break;
-//         default:
-//             fprintf(stderr, "Invalid I2C number %d. Options are 0 or 1.\n", 
-//                             i2c_number);
-//             return -1;
-//     }
-//     return 0;
-// }
-
 int set_spi_number(const char *arg) {
     int spi_number = atoi(arg);
     switch (spi_number) { // SPI bus number
@@ -101,21 +84,21 @@ int spi_transfer(int fd) {
 	int ret;
 	int i;
 	uint8_t frame_number = 0;
-	uint16_t delay = 0;
-	uint8_t tx[FRAME_SIZE] = {0, };
 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
+	uint8_t tx[FRAME_SIZE] = {0, };
+	uint16_t delay = 0;
 
-	// struct spi_ioc_transfer tr = {
-	// 	.tx_buf = (unsigned long)tx,
-	// 	.rx_buf = (unsigned long)lepton_frame_packet,
-	// 	.len = FRAME_SIZE,
-	// 	.delay_usecs = delay,
-	// 	.speed_hz = spi_speed,
-	// 	.bits_per_word = spi_bits_per_word,
-	// };
+	struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)tx,
+		.rx_buf = (unsigned long)lepton_frame_packet,
+		.len = FRAME_SIZE,
+		.delay_usecs = delay,
+		.speed_hz = spi_speed,
+		.bits_per_word = spi_bits_per_word,
+	};
 
-	// ret = ioctl(fd, SPI_IOC_MESSAGE(4), &tr);
-    ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
+	ret = ioctl(fd, SPI_IOC_MESSAGE(4), &tr);
+    // ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
 		pabort("can't send spi message");
 
@@ -129,7 +112,6 @@ int spi_transfer(int fd) {
 			}
 		}
 	}
-    usleep(1000);
 	return frame_number;
 }
 

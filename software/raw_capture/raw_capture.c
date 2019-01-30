@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // make the transfer
-    while(spi_transfer(spi_fd) < IMAGE_WIDTH);
+    while(spi_transfer(spi_fd) < IMAGE_WIDTH-1);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {

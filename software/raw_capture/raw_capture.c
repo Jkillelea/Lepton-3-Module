@@ -111,9 +111,9 @@ int spi_transfer(int fd) {
         frame_number = lepton_frame_packet[1];
         for(i = 0; i < IMAGE_WIDTH; i++) {
             uint32_t idx = 2*i + 4;
-            image[frame_number][i] = (lepton_frame_packet[idx] << 8 
-                                      | lepton_frame_packet[idx+1]);
-            fprintf(stderr, "%d\n", idx);
+            image[frame_number][i] = (lepton_frame_packet[2*i + 4] << 8 
+                                      | lepton_frame_packet[2*i + 5]);
+            fprintf(stderr, "%d\n", 2*i + 4);
         }
 	}
 

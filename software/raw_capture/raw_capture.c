@@ -81,6 +81,8 @@ int open_spi_port(const char *path) {
 }
 
 int spi_transfer(int fd) {
+    fprintf(stderr, "spi_transfer");
+
 	int ret;
 	int i;
     int frame_number = -1;

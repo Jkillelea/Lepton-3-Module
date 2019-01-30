@@ -100,9 +100,10 @@ int open_spi_port(const char *path) {
 int spi_transfer(int fd) {
 	int ret;
 	int i;
-	int frame_number = 0;
+	uint8_t frame_number = 0;
 	uint8_t tx[FRAME_SIZE] = {0, };
 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
+
 	struct spi_ioc_transfer tr = {
 		.tx_buf = (unsigned long)tx,
 		.rx_buf = (unsigned long)lepton_frame_packet,
@@ -121,8 +122,8 @@ int spi_transfer(int fd) {
 		if(frame_number < IMAGE_HEIGHT) {
 			for(i = 0; i < IMAGE_WIDTH; i++) {
 				image[frame_number][i] = 
-                    (lepton_frame_packet[2*i+4] << 8 
-                   | lepton_frame_packet[2*i+5]);
+                        (lepton_frame_packet[2*i+4] << 8 
+                       | lepton_frame_packet[2*i+5]);
 			}
 		}
 	}

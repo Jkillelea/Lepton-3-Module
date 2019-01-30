@@ -105,16 +105,17 @@ int spi_transfer(int fd) {
 	uint8_t tx[FRAME_SIZE] = {0, };
 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
 
-	struct spi_ioc_transfer tr = {
-		.tx_buf = (unsigned long)tx,
-		.rx_buf = (unsigned long)lepton_frame_packet,
-		.len = FRAME_SIZE,
-		.delay_usecs = delay,
-		.speed_hz = spi_speed,
-		.bits_per_word = spi_bits_per_word,
-	};
+	// struct spi_ioc_transfer tr = {
+	// 	.tx_buf = (unsigned long)tx,
+	// 	.rx_buf = (unsigned long)lepton_frame_packet,
+	// 	.len = FRAME_SIZE,
+	// 	.delay_usecs = delay,
+	// 	.speed_hz = spi_speed,
+	// 	.bits_per_word = spi_bits_per_word,
+	// };
 
-	ret = ioctl(fd, SPI_IOC_MESSAGE(4), &tr);
+	// ret = ioctl(fd, SPI_IOC_MESSAGE(4), &tr);
+    ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
 		pabort("can't send spi message");
 

@@ -22,7 +22,7 @@ int i2c_number;
 
 int     spi_fd = -1;
 char    spi_path[255];
-int     spi_speed = 20000000;
+int     spi_speed = 16000000;
 uint8_t spi_mode = SPI_MODE_3;
 uint8_t spi_bits_per_word = 8;
 
@@ -105,8 +105,10 @@ int spi_transfer(int fd) {
     uint8_t frame_number = lepton_frame_packet[1];
 	if(frame_ok && (frame_number < IMAGE_HEIGHT)) {
         for(i = 0; i < IMAGE_WIDTH; i++) {
-            image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
-                                      | lepton_frame_packet[2*i+5]);
+            uint32_t idx = 2*i + 4;
+            image[frame_number][i] = (lepton_frame_packet[idx] << 8 
+                                      | lepton_frame_packet[idx+1]);
+            fprintf(stderr, "%d\n", idx);
         }
 	}
 

@@ -217,6 +217,7 @@ void LeptonThread::snapshot(){
 	myImage.save(QString(name), "PNG", 100);
 	
 	//---------------------- create raw data text file -----------------------
+	const char *prefix = "raw";
 	ext = ".txt";
 	strcpy(name, prefix);
 	strcat(name, number);
@@ -227,7 +228,7 @@ void LeptonThread::snapshot(){
 
 	for(int i = 0; i < HEIGHT; i++){
 			for(int j = 0; j < WIDTH; j++){
-				sprintf(values, "%f", raw2Celsius(raw[i][j]));
+				sprintf(values, "%d", raw[i][j]);
 				fputs(values, arq);
 				fputs(" ", arq);
 			}

@@ -129,6 +129,7 @@ int spi_transfer(int fd) {
 			}
 		}
 	}
+    usleep(1000);
 	return frame_number;
 }
 

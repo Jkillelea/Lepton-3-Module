@@ -111,17 +111,29 @@ int spi_transfer(int fd) {
                                                  lepton_frame_packet[2], 
                                                  lepton_frame_packet[3]);
 
-	if(frame_ok) {
-        fprintf(stderr, "frame ok\n");
+    if(((lepton_frame_packet[0]&0xf) != 0x0f)) {
+		frame_number = lepton_frame_packet[1];
 
-        frame_number = lepton_frame_packet[1];
-        fprintf(stderr, "frame %d\n", frame_number);
-
-        for(i = 0; i < IMAGE_WIDTH; i++) {
-            image[frame_number][i] = (lepton_frame_packet[2*i + 4] << 8 
-                                      | lepton_frame_packet[2*i + 5]);
-        }
+		if(frame_number < IMAGE_HEIGHT ) {
+			for(i=0;i<IMAGE_WIDTH;i++) {
+				image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
+                                                | lepton_frame_packet[2*i+5]);
+			}
+		}
 	}
+
+
+	// if(frame_ok) {
+    //     fprintf(stderr, "frame ok\n");
+
+    //     frame_number = lepton_frame_packet[1];
+    //     fprintf(stderr, "frame %d\n", frame_number);
+
+    //     for(i = 0; i < IMAGE_WIDTH; i++) {
+    //         image[frame_number][i] = (lepton_frame_packet[2*i + 4] << 8 
+    //                                   | lepton_frame_packet[2*i + 5]);
+    //     }
+	// }
 
 
 	return frame_number;

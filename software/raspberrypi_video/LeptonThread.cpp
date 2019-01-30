@@ -217,7 +217,7 @@ void LeptonThread::snapshot(){
 	myImage.save(QString(name), "PNG", 100);
 	
 	//---------------------- create raw data text file -----------------------
-	const char *prefix = "raw";
+	prefix = "raw";
 	ext = ".txt";
 	strcpy(name, prefix);
 	strcat(name, number);

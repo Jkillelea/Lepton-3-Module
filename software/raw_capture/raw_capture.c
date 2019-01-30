@@ -99,17 +99,18 @@ int spi_transfer(int fd) {
 
     fprintf(stderr, "ioctl\n");
 	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    // ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
 		pabort("can't send spi message");
 
+    bool frame_ok = (lepton_frame_packet[0] & 0x0f) != 0x0f;
     uint8_t  segment_number = lepton_frame_packet[0] >> 4;
     uint16_t packet_number  = (lepton_frame_packet[0] << 4 
                              | lepton_frame_packet[1]);
 
-    fprintf(stderr, "segment %d packet %d\n", segment_number, packet_number);
+    fprintf(stderr, "Ok %d segment %d packet %d\n", frame_ok, 
+                                                    segment_number, 
+                                                    packet_number);
 
-    // bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
     // if (frame_ok) {
     //     fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
     //                                                  lepton_frame_packet[1], 

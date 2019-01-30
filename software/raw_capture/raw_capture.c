@@ -98,27 +98,27 @@ int spi_transfer(int fd) {
 	};
 
     fprintf(stderr, "ioctl\n");
-	// ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    // ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
 		pabort("can't send spi message");
 
+    fprintf(stderr, "%d\n", lepton_frame_packet[0] >> 4);
 
     // bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
-    bool frame_ok = true;
-    if (frame_ok) {
-        fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
-                                                     lepton_frame_packet[1], 
-                                                     lepton_frame_packet[2], 
-                                                     lepton_frame_packet[3]);
-		frame_number = lepton_frame_packet[1];
-		if (frame_number < IMAGE_HEIGHT) {
-			for (int i = 0; i < 80; i++) {
-				image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
-                                        | lepton_frame_packet[2*i+5]);
-			}
-		}
-	}
+    // if (frame_ok) {
+    //     fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
+    //                                                  lepton_frame_packet[1], 
+    //                                                  lepton_frame_packet[2], 
+    //                                                  lepton_frame_packet[3]);
+	// 	frame_number = lepton_frame_packet[1];
+	// 	if (frame_number < IMAGE_HEIGHT) {
+	// 		for (int i = 0; i < IMAGE_WIDTH; i++) {
+	// 			image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
+    //                                     | lepton_frame_packet[2*i+5]);
+	// 		}
+	// 	}
+	// }
 
 	return frame_number;
 }

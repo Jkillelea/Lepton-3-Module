@@ -103,10 +103,11 @@ int spi_transfer(int fd) {
 	if (ret < 1)
 		pabort("can't send spi message");
 
-    uint16_t packet_number = lepton_frame_packet[0] << 4 
-                                | lepton_frame_packet[1];
+    uint8_t  segment_number = lepton_frame_packet[0] >> 4;
+    uint16_t packet_number  = (lepton_frame_packet[0] << 4 
+                             | lepton_frame_packet[1]);
 
-    fprintf(stderr, "packet number %d\n", packet_number);
+    fprintf(stderr, "segment %d packet %d\n", segment_number, packet_number);
 
     // bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
     // if (frame_ok) {

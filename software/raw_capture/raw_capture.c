@@ -14,7 +14,8 @@
 
 #define IMAGE_WIDTH (160)
 #define IMAGE_HEIGHT (120)
-#define FRAME_SIZE (2*IMAGE_WIDTH + 10)
+// #define FRAME_SIZE (2*IMAGE_WIDTH + 4)
+#define FRAME_SIZE (164)
 
 uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
 
@@ -103,7 +104,8 @@ int spi_transfer(int fd) {
 		pabort("can't send spi message");
 
 
-    bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
+    // bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
+    bool frame_ok = true;
     if (frame_ok) {
         fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
                                                      lepton_frame_packet[1], 
@@ -111,7 +113,7 @@ int spi_transfer(int fd) {
                                                      lepton_frame_packet[3]);
 		frame_number = lepton_frame_packet[1];
 		if (frame_number < IMAGE_HEIGHT) {
-			for (int i = 0; i < IMAGE_WIDTH; i++) {
+			for (int i = 0; i < 80; i++) {
 				image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
                                         | lepton_frame_packet[2*i+5]);
 			}

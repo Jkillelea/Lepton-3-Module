@@ -83,6 +83,7 @@ int open_spi_port(const char *path) {
 int spi_transfer(int fd) {
 	int ret;
 	int i;
+    uint8_t frame_number = -1;
 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
 	uint8_t tx[FRAME_SIZE] = {0, };
 	uint16_t delay = 0;
@@ -102,8 +103,8 @@ int spi_transfer(int fd) {
 		pabort("can't send spi message");
 
     bool frame_ok = ((lepton_frame_packet[0] & 0x0f) == 0x0f);
-    uint8_t frame_number = lepton_frame_packet[1];
 	if(frame_ok && (frame_number < IMAGE_HEIGHT)) {
+        frame_number = lepton_frame_packet[1];
         for(i = 0; i < IMAGE_WIDTH; i++) {
             uint32_t idx = 2*i + 4;
             image[frame_number][i] = (lepton_frame_packet[idx] << 8 
@@ -132,7 +133,6 @@ int main(int argc, char *argv[]) {
 
     // make the transfer
     while(spi_transfer(spi_fd) != 59);
-
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {

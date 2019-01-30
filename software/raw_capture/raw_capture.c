@@ -104,13 +104,13 @@ int spi_transfer(int fd) {
 	if (ret < 1)
 		pabort("can't send spi message");
 
-    fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
-                                                 lepton_frame_packet[1], 
-                                                 lepton_frame_packet[2], 
-                                                 lepton_frame_packet[3]);
 
     bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
     if (frame_ok) {
+        fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
+                                                     lepton_frame_packet[1], 
+                                                     lepton_frame_packet[2], 
+                                                     lepton_frame_packet[3]);
 		frame_number = lepton_frame_packet[1];
 		if (frame_number < IMAGE_HEIGHT) {
 			for (int i = 0; i < IMAGE_WIDTH; i++) {

@@ -112,6 +112,7 @@ int spi_transfer(int fd) {
             fprintf(stderr, "%d\n", idx);
         }
 	}
+    fprintf(stderr, "frame %d\n", frame_number);
 
 	return frame_number;
 }

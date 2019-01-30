@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Lepton_I2C.h"
 #include "lepton-sdk-fork/LEPTON_SDK.h"
+#include "lepton-sdk-fork/LEPTON_ErrorCodes.h"
 #include "lepton-sdk-fork/LEPTON_SYS.h"
 #include "lepton-sdk-fork/LEPTON_Types.h"
 #include "lepton-sdk-fork/LEPTON_AGC.h"
@@ -63,13 +64,12 @@ void lepton_restart() {
 			printf("error code: %d\n", res);
 		}
 	}
+
 	printf("restarting...\n");
-	int res = (int)LEP_RunOemReboot(&_port);
-/*
-	if(res != 0) {
+	Result res = LEP_RunOemReboot(&_port);
+
+	if(res != LEP_OK)
 		printf("restart unsuccessful with error: %d\n", res);
-	} else {
+	else
 		printf("restart successful!\n");
-	}
-*/
 }

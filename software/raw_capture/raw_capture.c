@@ -105,7 +105,7 @@ int spi_transfer(int fd) {
 	if (ret < 1)
 		pabort("can't send spi message");
 
-    bool frame_ok = ((lepton_frame_packet[0] & 0x0f) == 0x0f);
+    bool frame_ok = ((lepton_frame_packet[0] & 0x0f) != 0x0f);
     fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
                                                  lepton_frame_packet[1], 
                                                  lepton_frame_packet[2], 

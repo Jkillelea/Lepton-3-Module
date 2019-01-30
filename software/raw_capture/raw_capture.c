@@ -148,6 +148,12 @@ int main(int argc, char *argv[]) {
     while(spi_transfer(spi_fd) != 59);
 
 
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        for (int j = 0; j < IMAGE_WIDTH; j++) {
+            printf("%d ", image[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }

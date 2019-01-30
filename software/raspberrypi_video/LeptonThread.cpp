@@ -202,12 +202,12 @@ void LeptonThread::snapshot(){
 	strcat(name, number);
 	strcat(name, ext);
 
-	//if this name already exists
-	int exists = stat(name,&buf);
+	// if this name already exists
+	int exists = stat(name, &buf);
 
-	//if the name exists stat returns 0
-    while (exists == 0){
-        //try next number
+	// if the name exists stat returns 0
+    while (exists == 0) {
+        // try next number
         snapshotCount++;
         strcpy(name, prefix);
         sprintf(number, "%d", snapshotCount);
@@ -225,7 +225,7 @@ void LeptonThread::snapshot(){
 	strcat(name, number);
 	strcat(name, ext);
 	
-	FILE *arq = fopen(name,"wt");
+	FILE *arq = fopen(name, "wt");
 	char values[64];
 
 	for(int i = 0; i < HEIGHT; i++){

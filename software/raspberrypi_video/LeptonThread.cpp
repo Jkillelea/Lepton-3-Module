@@ -84,7 +84,7 @@ void LeptonThread::run() {
 
 				int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
 
-				// printf("packetNumber: 0x%x\n", packetNumber);
+				printf("packetNumber: 0x%x\n", packetNumber);
 				// if it's a drop packet, reset j to 0, set to -1 so he'll be at 0 again loop
                 if (packetNumber != j) {
                     j = -1;
@@ -226,7 +226,7 @@ void LeptonThread::snapshot(){
 	strcat(name, ext);
 	
 	FILE *arq = fopen(name, "wt");
-	char values[64];
+	char values[1024];
 
 	for(int i = 0; i < HEIGHT; i++){
 			for(int j = 0; j < WIDTH; j++){

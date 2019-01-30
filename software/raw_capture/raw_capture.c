@@ -99,8 +99,8 @@ int spi_transfer(int fd) {
 	};
 
     fprintf(stderr, "ioctl\n");
-	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    // ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
+	// ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+    ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
 		pabort("can't send spi message");
 

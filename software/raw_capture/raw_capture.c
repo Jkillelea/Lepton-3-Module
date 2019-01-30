@@ -81,7 +81,7 @@ int open_spi_port(const char *path) {
 }
 
 int spi_transfer(int fd) {
-    fprintf(stderr, "spi_transfer");
+    fprintf(stderr, "spi_transfer\n");
 
 	int ret;
 	int i;
@@ -99,6 +99,7 @@ int spi_transfer(int fd) {
 		.bits_per_word = spi_bits_per_word,
 	};
 
+    fprintf(stderr, "ioctl\n");
 	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
     // ret = read(fd, lepton_frame_packet, sizeof(lepton_frame_packet));
 	if (ret < 1)
@@ -106,6 +107,7 @@ int spi_transfer(int fd) {
 
     bool frame_ok = ((lepton_frame_packet[0] & 0x0f) == 0x0f);
 	if(frame_ok) {
+        fprintf(stderr, "frame ok\n");
         frame_number = lepton_frame_packet[1];
         for(i = 0; i < IMAGE_WIDTH; i++) {
             uint32_t idx = 2*i + 4;
@@ -114,6 +116,7 @@ int spi_transfer(int fd) {
             fprintf(stderr, "%d\n", idx);
         }
 	}
+
     fprintf(stderr, "frame %d\n", frame_number);
 
 	return frame_number;

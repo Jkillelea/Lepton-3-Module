@@ -151,15 +151,18 @@ int main(int argc, char *argv[]) {
     int resets = 0;
     int segmentNumber = 0;
 
-    for(int i = 0; i < NUMBER_OF_SEGMENTS; i++) {
+    // beginning of data
+    uint16_t *image_ptr = *image;
+
+    for(int i = 0; i < NUM_SEGMENTS; i++) {
         for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
 
             // read data packets from lepton over SPI
             read(spi_fd,
-                image+sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j),
-                sizeof(uint8_t)*PACKET_SIZE);
+                image_ptr+sizeof(uint8_t)*FRAME_SIZE*(i*PACKETS_PER_SEGMENT+j),
+                sizeof(uint8_t)*FRAME_SIZE);
 
-            int packetNumber = image[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
+            int packetNumber = image_ptr[((i*PACKETS_PER_SEGMENT+j)*FRAME_SIZE)+1];
 
             // printf("packetNumber: 0x%x\n", packetNumber);
             // if it's a drop packet, reset j to 0, set to -1 so he'll be at 0 again loop
@@ -169,15 +172,12 @@ int main(int argc, char *argv[]) {
                 usleep(1000);
                 continue;
                 if (resets == 100) {
-                    SpiClosePort(0);
-                    qDebug() << "restarting spi...";
-                    usleep(5000);
-                    SpiOpenPort(0);
+                    return -1;
                 }
             } else {
                 if(packetNumber == 20) {
                     // reads the "ttt" number
-                    segmentNumber = image[(i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE] >> 4;
+                    segmentNumber = image_ptr[(i*PACKETS_PER_SEGMENT+j)*FRAME_SIZE] >> 4;
                     // if it's not the segment expected reads again
                     // for some reason segment are shifted, 1 down in result
                     // (i+1)%4 corrects this shifting

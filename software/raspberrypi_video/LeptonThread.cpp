@@ -189,7 +189,7 @@ void LeptonThread::snapshot(){
 	snapshotCount++;
 	//---------------------- create image file -----------------------
 	struct stat buf;
-	const char *prefix = "rgb";
+	const char *prefix = "results/rgb";
 	const char *ext = ".png";
 	char number[32];
 
@@ -219,7 +219,7 @@ void LeptonThread::snapshot(){
 	myImage.save(QString(name), "PNG", 100);
 	
 	//---------------------- create raw data text file -----------------------
-	prefix = "raw";
+	prefix = "results/raw";
 	ext = ".txt";
 	strcpy(name, prefix);
 	strcat(name, number);

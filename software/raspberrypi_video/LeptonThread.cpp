@@ -70,22 +70,22 @@ void LeptonThread::run() {
 	//open spi port
 	emit updateImage(myImage);
 
-	while (true) {
-		int resets = 0;
-		int segmentNumber = 0;
+    while (true) {
+        int resets = 0;
+        int segmentNumber = 0;
 
-		for(int i = 0; i < NUMBER_OF_SEGMENTS; i++) {
-			for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
+        for(int i = 0; i < NUMBER_OF_SEGMENTS; i++) {
+            for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
 
-				 // read data packets from lepton over SPI
-				 read(spi_cs0_fd, 
-                      result+sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j), 
-                      sizeof(uint8_t)*PACKET_SIZE);
+                // read data packets from lepton over SPI
+                read(spi_cs0_fd, 
+                    result+sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j), 
+                    sizeof(uint8_t)*PACKET_SIZE);
 
-				int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
+                int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
 
-				// printf("packetNumber: 0x%x\n", packetNumber);
-				// if it's a drop packet, reset j to 0, set to -1 so he'll be at 0 again loop
+                // printf("packetNumber: 0x%x\n", packetNumber);
+                // if it's a drop packet, reset j to 0, set to -1 so he'll be at 0 again loop
                 if (packetNumber != j) {
                     j = -1;
                     resets += 1;
@@ -111,9 +111,9 @@ void LeptonThread::run() {
                         }
                     }
                 }
-			}
-			usleep(1000/106);
-		}
+            }
+            usleep(1000/106);
+        }
 
 		frameBuffer = (uint16_t *) result;
 		int row, column;

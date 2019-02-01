@@ -10,22 +10,30 @@
 #include <linux/spi/spidev.h>
 
 #include <LEPTON_SDK.h>
+#include <LEPTON_SYS.h>
+#include <LEPTON_RAD.h>
+#include <LEPTON_Types.h>
 #include <LEPTON_ErrorCodes.h>
 
 #define IMAGE_WIDTH (160)
 #define IMAGE_HEIGHT (120)
-// #define FRAME_SIZE (2*IMAGE_WIDTH + 4)
 #define NUM_SEGMENTS (4)
 #define PACKETS_PER_SEGMENT (60)
-#define FRAME_SIZE (164)
+#define PACKETS_PER_FRAME (PACKETS_PER_SEGMENT*NUM_SEGMENTS)
+#define PACKET_SIZE (164)
+#define PACKET_SIZE_UINT16 (164/2)
 
 uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
+uint16_t *image_ptr = *image;
+uint8_t result[PACKET_SIZE*PACKETS_PER_SEGMENT];
+int frame = 0;
 
-int i2c_number;
+uint16_t i2c_number;
+LEP_CAMERA_PORT_DESC_T i2c_port;
 
 int     spi_fd = -1;
 char    spi_path[255];
-int     spi_speed = 16000000;
+int     spi_speed = 10000000;
 uint8_t spi_mode = SPI_MODE_3;
 uint8_t spi_bits_per_word = 8;
 
@@ -33,6 +41,91 @@ static void pabort(const char *s) {
 	perror(s);
 	abort();
 }
+
+int open_spi_port(const char *path);
+int set_spi_number(const char *arg);
+
+int main(int argc, char *argv[]) {
+    // parse opts
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
+        return -1;
+    }
+
+    // I2C bus number
+    switch (atoi(argv[1])) {
+        case 0:
+            break;
+        case 1:
+            break;
+        default:
+            pabort("Need to define I2C number as 0 or 1");
+    }
+
+    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
+        pabort("Couldn't open i2c port!");
+
+    if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
+        pabort("Couldn't disable telemetry!");
+
+    if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
+        pabort("Couldn't enable radiometry!");
+
+    // SPI bus number
+    if(set_spi_number(argv[2]) < 0)
+        return -1;
+
+    spi_fd = open_spi_port(spi_path);
+
+    for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
+        for (int pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
+            uint8_t packet[PACKET_SIZE] = {0};
+
+            read(spi_fd, packet, PACKET_SIZE);
+
+            if ((packet[0] & 0x0f) == 0x0f) { // 'drop' packet
+                fprintf(stderr, "drop\n");
+                // pak--;
+                continue;
+            }
+
+            uint16_t packet_number = (packet[0] &0x0f) << 4 
+                                    | packet[1];
+            
+            if (packet_number == 20) {
+                uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
+                fprintf(stderr, "%d %d\n", segment_number, packet_number);
+            }
+
+
+            // 4 byte offset
+            uint8_t *image_data = packet + 4;
+
+            // print out each pixel
+            for (int i = 0; i < IMAGE_WIDTH/2; i++) {
+                size_t idx = i*sizeof(uint16_t)/sizeof(uint8_t);
+                uint16_t pixel = image_data[idx] << 8
+                               | image_data[idx+1];
+
+                printf("%d ", pixel);
+            }
+
+            if (pak % 2 == 0)
+                printf("\n");
+
+        }
+    }
+
+    // for (int i = 0; i < IMAGE_HEIGHT; i++) {
+    //     for (int j = 0; j < IMAGE_WIDTH; j++) {
+    //         printf("%d ", image[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+
+    return 0;
+}
+
 
 int set_spi_number(const char *arg) {
     int spi_number = atoi(arg);
@@ -83,122 +176,4 @@ int open_spi_port(const char *path) {
     return spi_fd;
 }
 
-// int spi_transfer(int fd) {
-// 	int ret;
-//     int frame_number = -1;
-// 	uint8_t lepton_frame_packet[FRAME_SIZE] = {0, };
-// 	uint8_t tx[FRAME_SIZE] = {0, };
-// 	uint16_t delay = 0;
-// 
-// 	struct spi_ioc_transfer tr = {
-// 		.tx_buf = (unsigned long) tx,
-// 		.rx_buf = (unsigned long) lepton_frame_packet,
-// 		.len = FRAME_SIZE,
-// 		.delay_usecs = delay,
-// 		.speed_hz = spi_speed,
-// 		.bits_per_word = spi_bits_per_word,
-// 	};
-// 
-//     fprintf(stderr, "ioctl\n");
-// 	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-// 	if (ret < 1)
-// 		pabort("can't send spi message");
-// 
-//     bool frame_ok = (lepton_frame_packet[0] & 0x0f) != 0x0f;
-//     uint8_t  segment_number = lepton_frame_packet[0] >> 4;
-//     uint16_t packet_number  = (lepton_frame_packet[0] << 4 
-//                              | lepton_frame_packet[1]);
-// 
-//     fprintf(stderr, "Ok %d segment %d packet %d\n", frame_ok, 
-//                                                     segment_number, 
-//                                                     packet_number);
-// 
-//     // if (frame_ok) {
-//     //     fprintf(stderr, "frame header %x %x %x %x\n", lepton_frame_packet[0], 
-//     //                                                  lepton_frame_packet[1], 
-//     //                                                  lepton_frame_packet[2], 
-//     //                                                  lepton_frame_packet[3]);
-// 	// 	frame_number = lepton_frame_packet[1];
-// 	// 	if (frame_number < IMAGE_HEIGHT) {
-// 	// 		for (int i = 0; i < IMAGE_WIDTH; i++) {
-// 	// 			image[frame_number][i] = (lepton_frame_packet[2*i+4] << 8 
-//     //                                     | lepton_frame_packet[2*i+5]);
-// 	// 		}
-// 	// 	}
-// 	// }
-// 
-// 	return frame_number;
-// }
 
-
-int main(int argc, char *argv[]) {
-    // parse opts
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
-        return -1;
-    }
-
-    if(set_spi_number(argv[2]) < 0)
-        return -1;
-
-    fprintf(stderr, "SPI Path %s\n", spi_path);
-
-    spi_fd = open_spi_port(spi_path);
-
-    // make the transfer
-    // while(spi_transfer(spi_fd) < IMAGE_WIDTH-1);
-
-    int resets = 0;
-    int segmentNumber = 0;
-
-    // beginning of data
-    uint16_t *image_ptr = *image;
-
-    for(int i = 0; i < NUM_SEGMENTS; i++) {
-        for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
-
-            // read data packets from lepton over SPI
-            read(spi_fd,
-                image_ptr+sizeof(uint8_t)*FRAME_SIZE*(i*PACKETS_PER_SEGMENT+j),
-                sizeof(uint8_t)*FRAME_SIZE);
-
-            int packetNumber = image_ptr[((i*PACKETS_PER_SEGMENT+j)*FRAME_SIZE)+1];
-
-            // printf("packetNumber: 0x%x\n", packetNumber);
-            // if it's a drop packet, reset j to 0, set to -1 so he'll be at 0 again loop
-            if (packetNumber != j) {
-                j = -1;
-                resets += 1;
-                usleep(1000);
-                continue;
-                if (resets == 100) {
-                    return -1;
-                }
-            } else {
-                if(packetNumber == 20) {
-                    // reads the "ttt" number
-                    segmentNumber = image_ptr[(i*PACKETS_PER_SEGMENT+j)*FRAME_SIZE] >> 4;
-                    // if it's not the segment expected reads again
-                    // for some reason segment are shifted, 1 down in result
-                    // (i+1)%4 corrects this shifting
-                    if (segmentNumber != (i+1)%4) {
-                        j = -1;
-                        // resets += 1;
-                        // usleep(1000);
-                    }
-                }
-            }
-        }
-        usleep(1000/106);
-    }
-
-
-    for (int i = 0; i < IMAGE_HEIGHT; i++) {
-        for (int j = 0; j < IMAGE_WIDTH; j++) {
-            printf("%d ", image[i][j]);
-        }
-        printf("\n");
-    }
-
-    return 0;
-}

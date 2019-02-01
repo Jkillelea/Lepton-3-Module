@@ -4,14 +4,16 @@ CFLAGS = -Wall
 CFLAGS += -O3
 # CFLAGS += -g
 
-INCLUDES = ../raspberrypi_libs/lepton-sdk-fork/
-CFLAGS += -I$(INCLUDES)
+LIB_PATH = ../raspberrypi_libs/lepton-sdk-fork/
+CFLAGS += -I$(LIB_PATH)
+
+SDK_LIB = $(LIB_PATH)/Debug/libLEPTON_SDK.a
 
 EXEC = raw_capture
 
 OUTDIR = Build
 
-OBJS = $(OUTDIR)/raw_capture.o
+OBJS = $(OUTDIR)/raw_capture.o $(SDK_LIB)
 
 .PHONY: all
 all: $(EXEC)

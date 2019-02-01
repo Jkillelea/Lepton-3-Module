@@ -38,8 +38,7 @@ int SpiOpenPort (int spi_device)
 	else
 		*spi_cs_fd = open(std::string("/dev/spidev0.0").c_str(), O_RDWR);
 
-	if (*spi_cs_fd < 0)
-	{
+	if (*spi_cs_fd < 0) {
 		perror("Error - Could not open SPI device");
 		exit(1);
 	}
@@ -88,9 +87,8 @@ int SpiOpenPort (int spi_device)
 	return(status_value);
 }
 
-int SpiClosePort(int spi_device)
-{
-		int status_value = -1;
+int SpiClosePort(int spi_device) {
+    int status_value = -1;
 	int *spi_cs_fd;
 
 	if (spi_device)
@@ -100,10 +98,10 @@ int SpiClosePort(int spi_device)
 
 
 	status_value = close(*spi_cs_fd);
-	if(status_value < 0)
-	{
+	if (status_value < 0) {
 		perror("Error - Could not close SPI device");
 		exit(1);
 	}
+
 	return(status_value);
 }

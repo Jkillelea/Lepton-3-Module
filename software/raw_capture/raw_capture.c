@@ -25,8 +25,6 @@
 
 uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
 uint16_t *image_ptr = *image;
-uint8_t result[PACKET_SIZE*PACKETS_PER_SEGMENT];
-int frame = 0;
 
 uint16_t i2c_number;
 LEP_CAMERA_PORT_DESC_T i2c_port;
@@ -37,6 +35,9 @@ int     spi_speed = 10000000;
 uint8_t spi_mode = SPI_MODE_3;
 uint8_t spi_bits_per_word = 8;
 
+static uint8_t packet[PACKET_SIZE] = {0};
+static int resets = 0;
+
 static void pabort(const char *s) {
 	perror(s);
 	abort();
@@ -44,6 +45,7 @@ static void pabort(const char *s) {
 
 int open_spi_port(const char *path);
 int set_spi_number(const char *arg);
+
 
 int main(int argc, char *argv[]) {
     // parse opts
@@ -62,6 +64,7 @@ int main(int argc, char *argv[]) {
             pabort("Need to define I2C number as 0 or 1");
     }
 
+    // Lepton config
     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
         pabort("Couldn't open i2c port!");
 
@@ -79,49 +82,47 @@ int main(int argc, char *argv[]) {
 
     for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
         for (int pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
-            uint8_t packet[PACKET_SIZE] = {0};
+            size_t offset = 80*pak + 60*80*seg;
 
             read(spi_fd, packet, PACKET_SIZE);
 
-            if ((packet[0] & 0x0f) == 0x0f) { // 'drop' packet
-                fprintf(stderr, "drop\n");
-                // pak--;
-                continue;
+            uint16_t packet_number = ((packet[0] &0x0f) << 4) | packet[1];
+            uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
+
+            // if ((packet[0] & 0x0f) == 0x0f)
+            //     pak--;
+
+            fprintf(stderr, "%d %d\n", segment_number, packet_number);
+
+            // if (packet_number != pak) {
+            //     pak--;
+            //     resets++;
+            //     usleep(1000);
+            //     if (resets == 100) {
+            //         resets = 0;
+            //         close(spi_fd);
+            //         fprintf(stderr, "Restarting SPI\n");
+            //         usleep(185*1000);
+            //         open_spi_port(spi_path);
+            //     }
+            //     continue;
+            // }
+
+            fprintf(stderr, "offset: %d\n", offset);
+
+            for (int i = 0; i < 80; i++) {
+                size_t idx = 2*i + 4;
+                image_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];
             }
-
-            uint16_t packet_number = (packet[0] &0x0f) << 4 
-                                    | packet[1];
-            
-            if (packet_number == 20) {
-                uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-                fprintf(stderr, "%d %d\n", segment_number, packet_number);
-            }
-
-
-            // 4 byte offset
-            uint8_t *image_data = packet + 4;
-
-            // print out each pixel
-            for (int i = 0; i < IMAGE_WIDTH/2; i++) {
-                size_t idx = i*sizeof(uint16_t)/sizeof(uint8_t);
-                uint16_t pixel = image_data[idx] << 8
-                               | image_data[idx+1];
-
-                printf("%d ", pixel);
-            }
-
-            if (pak % 2 == 0)
-                printf("\n");
-
         }
     }
 
-    // for (int i = 0; i < IMAGE_HEIGHT; i++) {
-    //     for (int j = 0; j < IMAGE_WIDTH; j++) {
-    //         printf("%d ", image[i][j]);
-    //     }
-    //     printf("\n");
-    // }
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        for (int j = 0; j < IMAGE_WIDTH; j++) {
+            printf("%d ", image[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }

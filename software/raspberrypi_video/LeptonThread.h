@@ -34,6 +34,7 @@ public:
   ~LeptonThread();
 
   void run();
+  void enableRadiometry();
 
 public slots:
   void performFFC();

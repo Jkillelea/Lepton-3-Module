@@ -21,6 +21,7 @@ static void pabort(const char *s) {
 
 LeptonThread::LeptonThread() : QThread() {
     SpiOpenPort(0);
+    this->enableRadiometry();
 }
 
 LeptonThread::~LeptonThread() {
@@ -244,6 +245,10 @@ void LeptonThread::snapshot(){
 // perform FFC
 void LeptonThread::performFFC() {
 	lepton_perform_ffc();
+}
+
+void LeptonThread::enableRadiometry() {
+	lepton_enable_radiometry();
 }
 
 void LeptonThread::restart() {

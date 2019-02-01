@@ -5,6 +5,7 @@
 #include "lepton-sdk-fork/LEPTON_SYS.h"
 #include "lepton-sdk-fork/LEPTON_Types.h"
 #include "lepton-sdk-fork/LEPTON_AGC.h"
+#include "lepton-sdk-fork/LEPTON_RAD.h"
 #include "lepton-sdk-fork/LEPTON_OEM.h"
 
 bool _connected;
@@ -17,6 +18,12 @@ int lepton_connect() {
 	int res = (int)LEP_OpenPort(1, LEP_CCI_TWI, 400, &_port);
 	_connected = true;
 	return res;
+}
+
+int lepton_enable_radiometry() {
+    int res = (int) LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
+    return res;
+
 }
 
 int lepton_temperature(){

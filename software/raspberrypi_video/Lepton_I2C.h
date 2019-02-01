@@ -2,7 +2,9 @@
 #define LEPTON_I2C
 
 void lepton_perform_ffc();
+int lepton_enable_radiometry();
 int lepton_temperature();
 float raw2Celsius(float);
 void lepton_restart();
+
 #endif

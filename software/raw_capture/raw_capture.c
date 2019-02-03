@@ -23,29 +23,29 @@
 #define PACKET_SIZE (164)
 #define PACKET_SIZE_UINT16 (164/2)
 
-uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
-uint16_t *image_ptr = *image;
+// Image
+static uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
+static uint16_t *image_ptr = *image;
 
-uint16_t i2c_number;
-LEP_CAMERA_PORT_DESC_T i2c_port;
+// I2C vars
+static uint16_t i2c_number;
+static LEP_CAMERA_PORT_DESC_T i2c_port;
 
-int     spi_fd = -1;
-char    spi_path[255];
-int     spi_speed = 10000000;
-uint8_t spi_mode = SPI_MODE_3;
-uint8_t spi_bits_per_word = 8;
+// SPI protocol vars
+static int     spi_fd    = -1;
+static int     spi_speed = 10000000;
+static uint8_t spi_mode  = SPI_MODE_3;
+static char    spi_path[255];
+static uint8_t spi_bits_per_word = 8;
 
-static uint8_t packet[PACKET_SIZE] = {0};
+// SPI communication vars
+static uint8_t packet[PACKET_SIZE] = {0xff};
 static int resets = 0;
 
-static void pabort(const char *s) {
-	perror(s);
-	abort();
-}
-
-int open_spi_port(const char *path);
-int set_spi_number(const char *arg);
-
+// Functions
+static void pabort(const char *s);
+static int open_spi_port(const char *path);
+static int set_spi_number(const char *arg);
 
 int main(int argc, char *argv[]) {
     // parse opts
@@ -84,13 +84,18 @@ int main(int argc, char *argv[]) {
         for (int pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
             size_t offset = 80*pak + 60*80*seg;
 
-            read(spi_fd, packet, PACKET_SIZE);
+            if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
+                fprintf(stderr, "SPI failed to read enough bytes!\n");
+
+
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                pak--;
+                continue;
+            }
 
             uint16_t packet_number = ((packet[0] &0x0f) << 4) | packet[1];
             uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-
-            // if ((packet[0] & 0x0f) == 0x0f)
-            //     pak--;
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
@@ -128,7 +133,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-int set_spi_number(const char *arg) {
+static int set_spi_number(const char *arg) {
     int spi_number = atoi(arg);
     switch (spi_number) { // SPI bus number
         case 0:
@@ -145,7 +150,7 @@ int set_spi_number(const char *arg) {
     return 0;
 }
 
-int open_spi_port(const char *path) {
+static int open_spi_port(const char *path) {
     int ret;
 	int spi_fd = open(path, O_RDWR);
 	if (spi_fd < 0)
@@ -178,3 +183,7 @@ int open_spi_port(const char *path) {
 }
 
 
+static void pabort(const char *s) {
+	perror(s);
+	abort();
+}

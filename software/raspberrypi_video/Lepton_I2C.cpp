@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "Lepton_I2C.h"
 #include "lepton-sdk-fork/LEPTON_SDK.h"
 #include "lepton-sdk-fork/LEPTON_ErrorCodes.h"
@@ -8,7 +9,7 @@
 #include "lepton-sdk-fork/LEPTON_RAD.h"
 #include "lepton-sdk-fork/LEPTON_OEM.h"
 
-bool _connected;
+bool _connected = false;
 
 LEP_CAMERA_PORT_DESC_T _port;
 LEP_SYS_FPA_TEMPERATURE_KELVIN_T fpa_temp_kelvin;
@@ -21,6 +22,9 @@ int lepton_connect() {
 }
 
 int lepton_enable_radiometry() {
+    if (!_connected)
+        lepton_connect();
+
     int res = (int) LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
     return res;
 

@@ -135,15 +135,15 @@ void LeptonThread::run() {
 			result[i*2] = result[i*2+1];
 			result[i*2+1] = temp;
 			
-			value = frameBuffer[i];
-			if(value> maxValue) {
-				maxValue = value;
-			}
+			// value = frameBuffer[i];
+			// if (value > maxValue) {
+			// 	maxValue = value;
+			// }
 
-			if(value < minValue) {
-				if(value != 0)
-					minValue = value;
-			}		
+			// if (value < minValue) {
+			// 	if (value != 0)
+			// 		minValue = value;
+			// }		
 		}
 		
 		float diff = maxValue - minValue;

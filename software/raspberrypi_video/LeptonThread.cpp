@@ -121,7 +121,7 @@ void LeptonThread::run() {
 		uint16_t value;
 		// uint16_t minValue = 65535;
 		// uint16_t maxValue = 0;
-		uint16_t minValue = 0xFFFF;
+		uint16_t minValue = 0xDFFF;
 		uint16_t maxValue = 0x0000;
 		
 		for (int i = 0; i < FRAME_SIZE_UINT16; i++) {

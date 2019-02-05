@@ -51,15 +51,14 @@ void lepton_perform_ffc() {
 			printf("error code: %d\n", res);
 		}
 	}
-/*
-	int res = (int)LEP_RunSysFFCNormalization(&_port);
-	if (res != 0) {
-		printf("FFC not successful\n");
-		printf("error code: %d\n", res);
-	} else {
-		printf("FFC successful\n");
-	}
-*/
+
+    int res = (int)LEP_RunSysFFCNormalization(&_port);
+    if (res != 0) {
+        printf("FFC not successful\n");
+        printf("error code: %d\n", res);
+    } else {
+        printf("FFC successful\n");
+    }
 }
 
 void lepton_restart() {

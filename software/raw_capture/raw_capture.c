@@ -102,8 +102,7 @@ int main(int argc, char *argv[]) {
             // Handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 fprintf(stderr, "drop %x\n", packet[0]);
-                if (pak > 0)
-                    pak--;
+                pak--;
                 continue;
             }
 
@@ -117,6 +116,7 @@ int main(int argc, char *argv[]) {
                 pak--;
                 resets++;
                 usleep(1000);
+                continue;
                 if (resets == 100) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
@@ -124,11 +124,9 @@ int main(int argc, char *argv[]) {
                     usleep(200000); // 200ms
                     open_spi_port(spi_path);
                 }
-                continue;
             }
 
-
-            size_t offset = 80*pak + 60*80*seg;
+            size_t offset = 80*packet_number + 60*80*segment_number;
             // fprintf(stderr, "offset: %d\n", offset);
 
             for (int i = 0; i < 80; i++) {

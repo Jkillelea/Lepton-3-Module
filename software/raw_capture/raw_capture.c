@@ -48,45 +48,7 @@ static void pabort(const char *s);
 static int open_spi_port(const char *path);
 static int set_spi_number(const char *arg);
 
-int main(int argc, char *argv[]) {
-    // parse opts
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
-        return -1;
-    }
-
-    // I2C bus number
-    switch (atoi(argv[1])) {
-        case 0:
-            i2c_number = 0;
-            break;
-        case 1:
-            i2c_number = 1;
-            break;
-        default:
-            pabort("Need to define I2C number as 0 or 1");
-    }
-
-    // Lepton config
-    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
-        pabort("Couldn't open i2c port!");
-
-    if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
-        pabort("Couldn't disable telemetry!");
-
-    if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
-        pabort("Couldn't enable radiometry!");
-
-    // SPI bus number
-    if(set_spi_number(argv[2]) < 0)
-        return -1;
-
-    spi_fd = open_spi_port(spi_path);
-
-    // just try and flush the line
-    for (int i = 0; i < 1000; i++)
-        read(spi_fd, packet, PACKET_SIZE);
-
+void read_image(uint16_t *data_ptr) {
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
             uint8_t  segment_number;
@@ -151,10 +113,52 @@ int main(int argc, char *argv[]) {
 
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;
-                image_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];
+                data_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];
             }
         }
     }
+}
+
+int main(int argc, char *argv[]) {
+    // parse opts
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
+        return -1;
+    }
+
+    // I2C bus number
+    switch (atoi(argv[1])) {
+        case 0:
+            i2c_number = 0;
+            break;
+        case 1:
+            i2c_number = 1;
+            break;
+        default:
+            pabort("Need to define I2C number as 0 or 1");
+    }
+
+    // Lepton config
+    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
+        pabort("Couldn't open i2c port!");
+
+    if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
+        pabort("Couldn't disable telemetry!");
+
+    if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
+        pabort("Couldn't enable radiometry!");
+
+    // SPI bus number
+    if(set_spi_number(argv[2]) < 0)
+        return -1;
+
+    spi_fd = open_spi_port(spi_path);
+
+    // just try and flush the line
+    for (int i = 0; i < 1000; i++)
+        read(spi_fd, packet, PACKET_SIZE);
+
+    read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {

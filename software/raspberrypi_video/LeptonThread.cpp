@@ -91,13 +91,13 @@ void LeptonThread::run() {
                     j = -1;
                     resets += 1;
                     usleep(1000);
-                    continue;
                     if (resets == 100) {
                         SpiClosePort(0);
                         qDebug() << "restarting spi...";
                         usleep(5000);
                         SpiOpenPort(0);
                     }
+                    continue;
                 } else {
                     if(packetNumber == 20) {
                         // reads the "ttt" number

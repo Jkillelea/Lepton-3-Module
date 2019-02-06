@@ -116,6 +116,11 @@ int main(int argc, char *argv[]) {
 
             if (packet_number == 20) {
                 segment_number = (packet[0] >> 4) & 0b00000111;
+                if (segment_number == 0) {
+                    seg = 1;
+                    pak = 0;
+                    continue;
+                }
                 seg = segment_number;
             }
 

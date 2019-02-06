@@ -74,7 +74,8 @@ void read_image(uint16_t *data_ptr) {
 
             if (packet_number == 20) {
                 seg = segment_number;
-                pak = packet_number - 1;
+                pak = packet_number + 1;
+                continue;
             }
             // packet_number  = (packet[0] << 4) | packet[1];
 

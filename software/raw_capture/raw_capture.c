@@ -107,16 +107,16 @@ int main(int argc, char *argv[]) {
                 continue;
             }
 
-            // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-            // uint16_t packet_number = (packet[0] << 4) | packet[1];
-
             uint8_t  segment_number = seg;
-            uint16_t packet_number  = packet[1];
+            // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
+            uint16_t packet_number = (packet[0] << 4) | packet[1];
+            // uint16_t packet_number  = packet[1];
+
+            pak = packet_number;
 
             if (packet_number == 20) {
                 segment_number = (packet[0] >> 4) & 0b00000111;
                 seg = segment_number;
-                pak = packet_number;
             }
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);

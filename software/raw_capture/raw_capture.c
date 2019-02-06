@@ -47,7 +47,7 @@ static int resets = 0;
 static void pabort(const char *s);
 static int open_spi_port(const char *path);
 static int set_spi_number(const char *arg);
-static void lepton_reboot_and_configure();
+// static void lepton_reboot_and_configure();
 
 int main(int argc, char *argv[]) {
     // parse opts
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
             uint16_t packet_number = packet[1];
             uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
 
-            fprintf(stderr, "%d %d\n", segment_number, packet_number);
+            // fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             if (packet_number != pak) {
                 pak--;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
             }
 
             size_t offset = 80*pak + 60*80*seg;
-            fprintf(stderr, "offset: %d\n", offset);
+            // fprintf(stderr, "offset: %d\n", offset);
 
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;
@@ -139,27 +139,6 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
-}
-
-static void lepton_reboot_and_configure() {
-    // Lepton config
-    if (LEP_RunOemReboot(&i2c_port) != LEP_OK)
-        pabort("Couldn't reboot!");
-
-    sleep(1);
-
-    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
-        pabort("Couldn't open i2c port!");
-
-    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
-        pabort("Couldn't open i2c port!");
-
-    if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
-        pabort("Couldn't disable telemetry!");
-
-    if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
-        pabort("Couldn't enable radiometry!");
-
 }
 
 static int set_spi_number(const char *arg) {
@@ -216,3 +195,25 @@ static void pabort(const char *s) {
 	perror(s);
 	abort();
 }
+
+// static void lepton_reboot_and_configure() {
+//     // Lepton config
+//     if (LEP_RunOemReboot(&i2c_port) != LEP_OK)
+//         pabort("Couldn't reboot!");
+// 
+//     sleep(1);
+// 
+//     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
+//         pabort("Couldn't open i2c port!");
+// 
+//     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
+//         pabort("Couldn't open i2c port!");
+// 
+//     if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
+//         pabort("Couldn't disable telemetry!");
+// 
+//     if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
+//         pabort("Couldn't enable radiometry!");
+// 
+// }
+

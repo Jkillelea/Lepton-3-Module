@@ -34,3 +34,7 @@ $(SDK_LIB):
 clean:
 	rm -rf $(OUTDIR)
 	rm -rf $(EXEC)
+
+.PHONY: sdkclean
+sdkclean:
+	make clean -C $(LIB_PATH)

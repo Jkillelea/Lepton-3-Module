@@ -85,14 +85,14 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // try and sync up
-    uint8_t segment_number;
-    uint16_t packet_number;
-    do {
-        read(spi_fd, packet, PACKET_SIZE);
-        segment_number = (packet[0] >> 4) & 0b00000111;
-        packet_number  = (packet[0] << 4) | packet[1];
-    } while (segment_number != 1 && packet_number != 0);
+    // // try and sync up
+    // uint8_t segment_number;
+    // uint16_t packet_number;
+    // do {
+    //     read(spi_fd, packet, PACKET_SIZE);
+    //     segment_number = (packet[0] >> 4) & 0b00000111;
+    //     packet_number  = (packet[0] << 4) | packet[1];
+    // } while (segment_number != 1 && packet_number != 0);
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 1; pak <= PACKETS_PER_SEGMENT; pak++) {
@@ -100,12 +100,12 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // // Handle drop packets
-            // if ((packet[0] & 0x0f) == 0x0f) {
-            //     fprintf(stderr, "drop %x\n", packet[0]);
-            //     pak--;
-            //     continue;
-            // }
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                fprintf(stderr, "drop %x\n", packet[0]);
+                pak--;
+                continue;
+            }
 
             uint8_t  segment_number = seg;
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;

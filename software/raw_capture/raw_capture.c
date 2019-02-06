@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
             }
 
-            if (packet_number == 20)
+            if (packet_number == 20 && segment_number >= 1)
                 seg = segment_number;
 
             // Warn on bounds error

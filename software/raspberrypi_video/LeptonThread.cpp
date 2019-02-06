@@ -140,10 +140,10 @@ void LeptonThread::run() {
 				maxValue = value;
 			}
 
-			// if (value < minValue) {
-			// 	if (value != 0)
-			// 		minValue = value;
-			// }		
+			if (value < minValue) {
+				if (value != 0)
+					minValue = value;
+			}		
 		}
 		
 		float diff = maxValue - minValue;

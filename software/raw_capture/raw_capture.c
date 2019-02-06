@@ -105,12 +105,12 @@ int main(int argc, char *argv[]) {
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            // // Handle drop packets
-            // if ((packet[0] & 0x0f) == 0x0f) {
-            //     // pak--;
-            //     fprintf(stderr, "drop\n");
-            //     continue;
-            // }
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                pak--;
+                fprintf(stderr, "drop\n");
+                continue;
+            }
 
             if (packet_number != pak) {
                 pak--;

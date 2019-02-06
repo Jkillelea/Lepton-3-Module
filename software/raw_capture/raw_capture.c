@@ -78,7 +78,7 @@ void read_image(uint16_t *data_ptr) {
             // handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 fprintf(stderr, "drop (%x)\n", packet[0]);
-                // pak--;
+                pak--;
                 continue;
             } 
 

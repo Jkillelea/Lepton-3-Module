@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
                 if (packet_number < pak)
                     pak = packet_number;
 
-                // pak--;
+                pak--;
                 resets++;
 
                 if (resets > 100) {

@@ -59,7 +59,7 @@ void read_image(uint16_t *data_ptr) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            fprintf(stderr, "%x %x ", packet[0], packet[1]);
+            // fprintf(stderr, "%x %x ", packet[0], packet[1]);
 
             // handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {

@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {
-            printf("%d ", 255.0 * image[i][j] / delta);
+            printf("%d ", (int) (255.0 * image[i][j] / delta) );
         }
         printf("\n");
     }

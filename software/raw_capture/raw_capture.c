@@ -107,8 +107,7 @@ int main(int argc, char *argv[]) {
             if (packet_number != pak) {
                 fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
 
-                if (pak > 0)
-                    pak--;
+                pak--;
 
                 resets++;
 

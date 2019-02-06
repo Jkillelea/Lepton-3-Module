@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     // } while (segment_number != 1 && packet_number != 0);
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
-        for (uint32_t pak = 1; pak <= PACKETS_PER_SEGMENT; pak++) {
+        for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");

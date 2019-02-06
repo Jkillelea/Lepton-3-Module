@@ -74,22 +74,11 @@ void read_image(uint16_t *data_ptr) {
 
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-            // skip segment number 0 (from datasheet)
-            if (packet_number == 20 && segment_number == 0) {
-                pak--;
-                continue;
-            }
-
-            // if (packet_number != pak) {
+            // // skip segment number 0 (from datasheet)
+            // if (packet_number == 20 && segment_number == 0) {
             //     pak--;
             //     continue;
             // }
-
-            // // Warn on bounds error
-            // if (segment_number < 0 || segment_number > NUM_SEGMENTS)
-            //     fprintf(stderr, "\tsegment number out of bounds\n");
-            // if (segment_number > PACKETS_PER_SEGMENT)
-            //     fprintf(stderr, "\tpacket number out of bounds\n");
 
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
@@ -159,8 +148,8 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // // read the line a lot
-    // for (int i = 0; i < 30; i++)
+    // read the line a lot
+    for (int i = 0; i < 30; i++)
         read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {

@@ -88,7 +88,9 @@ int main(int argc, char *argv[]) {
     // try and sync up
     do {
         read(spi_fd, packet, PACKET_SIZE);
-    } while ((packet[0] & 0x0f) == 0x0f);
+        uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
+        uint16_t packet_number = (packet[0] << 4) | packet[1];
+    } while (segment_number != 0 && packet_number != 0);
 
     for (uint32_t seg = 0; seg < NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
@@ -149,6 +151,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
 
 static int set_spi_number(const char *arg) {
     int spi_number = atoi(arg);

@@ -50,6 +50,7 @@ static int set_spi_number(const char *arg);
 void read_image(uint16_t *data_ptr) {
     uint8_t  segment_number = 0;
     uint16_t packet_number = 0;
+    uint32_t seg, pak = 0;
 
     // sync up to frame 1.20
     for (int i = 0; i < 10000; i++) {
@@ -58,13 +59,13 @@ void read_image(uint16_t *data_ptr) {
             fprintf(stderr, "SPI failed to read enough bytes!\n");
 
         // get segment and packet number
-        segment_number = (packet[0] >> 4) & 0b00000111;
-        packet_number  = ((packet[0] & 0x0f) << 4) | packet[1];
+        seg = (packet[0] >> 4) & 0b00000111;
+        pak  = ((packet[0] & 0x0f) << 4) | packet[1];
 
         if ((packet[0] & 0x0f) == 0x0f)
             continue;
 
-         if (segment_number == 1 && packet_number == 20)
+         if (seg == 1 && pak == 20)
              break;
     }
 

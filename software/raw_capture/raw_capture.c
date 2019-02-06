@@ -106,10 +106,15 @@ int main(int argc, char *argv[]) {
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
 
-            uint8_t segment_number = seg;
-            uint16_t packet_number = packet[1];
-            if (packet_number == 20)
+            uint8_t  segment_number = seg;
+            uint16_t packet_number  = packet[1];
+
+            if (packet_number == 20) {
                 segment_number = (packet[0] >> 4) & 0b00000111;
+                seg = segment_number;
+                pak = packet_number;
+            }
+
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
@@ -127,13 +132,7 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            if (segment_number >= NUM_SEGMENTS)
-                continue;
-            if (packet_number >= PACKETS_PER_SEGMENT)
-                continue;
-
-            size_t offset = 80*packet_number + 60*80*segment_number;
-            // fprintf(stderr, "offset: %d\n", offset);
+            size_t offset = 80*pak + 60*80*seg;
 
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;

@@ -29,18 +29,18 @@ static uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
 static uint16_t *image_ptr  = *image;
 
 // I2C vars
-static uint16_t i2c_number;
+static uint16_t i2c_number = -1;
 static LEP_CAMERA_PORT_DESC_T i2c_port;
 
 // SPI protocol vars
 static int     spi_fd    = -1;
-static int     spi_speed = 10000000;
+static int     spi_speed = 20000000;
 static uint8_t spi_mode  = SPI_MODE_3;
 static char    spi_path[255];
 static uint8_t spi_bits_per_word = 8;
 
 // SPI communication vars
-static uint8_t packet[PACKET_SIZE] = {0xff};
+static uint8_t packet[PACKET_SIZE] = {0x0};
 static int resets = 0;
 
 // Functions
@@ -54,6 +54,7 @@ void read_image(uint16_t *data_ptr) {
             uint8_t  segment_number;
             uint16_t packet_number;
 
+            memset(*image_ptr, 0, IMAGE_HEIGHT*IMAGE_WIDTH*sizeof(uint16_t));
 
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)

@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // just try and flush the caches
+    // just try and flush the line
     for (int i = 0; i < 1000; i++)
         read(spi_fd, packet, PACKET_SIZE);
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
             uint8_t  segment_number;
             uint16_t packet_number;
 
-            fprintf(stderr, "%d%d ", seg, pak);
+            fprintf(stderr, "%d.%d ", seg, pak);
 
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)

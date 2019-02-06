@@ -66,7 +66,8 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             } else {
                 segment_number = (packet[0] >> 4) & 0b00000111;
-                packet_number  = (packet[0] << 4) | packet[1];
+                packet_number  = packet[1];
+                // packet_number  = (packet[0] << 4) | packet[1];
                 fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
             }
 

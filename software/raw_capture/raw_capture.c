@@ -94,19 +94,21 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // // Handle drop packets
-            // if ((packet[0] & 0x0f) == 0x0f) {
-            //     pak--;
-            //     continue;
-            // }
-
             // uint16_t packet_number = ((packet[0] &0x0f) << 4) | packet[1];
             uint16_t packet_number = packet[1];
             uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
 
+            fprintf(stderr, "%d %d\n", segment_number, packet_number);
+
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                pak--;
+                fprintf(stderr, "drop\n");
+                continue;
+            }
 
             if (packet_number != pak) {
-                pak--;
+                // pak--;
                 resets++;
                 // usleep(1000);
                 if (resets == 100) {
@@ -123,7 +125,6 @@ int main(int argc, char *argv[]) {
             if (packet_number > 60 || segment_number > 3)
                 continue;
 
-            fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             size_t offset = 80*packet_number + 60*80*segment_number;
             // fprintf(stderr, "offset: %d\n", offset);

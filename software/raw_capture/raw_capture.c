@@ -25,8 +25,9 @@
 #define PACKET_SIZE_UINT16 (164/2)
 
 // Image
-static uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
-static uint16_t *image_ptr = *image;
+static uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
+static uint16_t *image_ptr  = *image;
+static size_t    max_offset = sizeof(image) / sizeof(uint16_t);
 
 // I2C vars
 static uint16_t i2c_number;
@@ -85,15 +86,6 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // // try and sync up
-    // uint8_t segment_number;
-    // uint16_t packet_number;
-    // do {
-    //     read(spi_fd, packet, PACKET_SIZE);
-    //     segment_number = (packet[0] >> 4) & 0b00000111;
-    //     packet_number  = (packet[0] << 4) | packet[1];
-    // } while (segment_number != 1 && packet_number != 0);
-
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 
@@ -130,9 +122,8 @@ int main(int argc, char *argv[]) {
 
             size_t offset = 80*packet_number + 4800*(segment_number-1);
 
-            size_t max_offset = sizeof(image) / sizeof(uint16_t);
+            fprintf(stderr, "%d %d\n", offset, max_offset);
 
-            // fprintf(stderr, "%d %d\n", offset, max_offset);
             // if (offset > max_offset)
             //     continue;
 

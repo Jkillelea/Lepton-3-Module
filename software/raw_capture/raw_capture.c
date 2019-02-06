@@ -100,12 +100,12 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // // Handle drop packets
-            // if ((packet[0] & 0x0f) == 0x0f) {
-            //     fprintf(stderr, "drop %x\n", packet[0]);
-            //     pak--;
-            //     continue;
-            // }
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                fprintf(stderr, "drop %x\n", packet[0]);
+                pak--;
+                continue;
+            }
 
             uint8_t segment_number = seg;
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;

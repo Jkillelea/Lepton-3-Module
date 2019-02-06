@@ -67,6 +67,11 @@ void read_image(uint16_t *data_ptr) {
             //     continue;
             // } 
 
+            if ((packet[0] & 0x0f) == 0x0f) {
+                pak--;
+                continue;
+            }
+
             fprintf(stderr, "%d.%d ", seg, pak);
 
             // get segment and packet number
@@ -76,11 +81,16 @@ void read_image(uint16_t *data_ptr) {
 
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-            // // skip segment number 0 (from datasheet)
-            // if (segment_number == 0) {
-            //     pak--;
-            //     continue;
-            // }
+            // skip segment number 0 (from datasheet)
+            if (segment_number == 0) {
+                pak--;
+                continue;
+            }
+
+            if (packet_number != pak) {
+                pak--;
+                continue;
+            }
 
             // // Warn on bounds error
             // if (segment_number < 0 || segment_number > NUM_SEGMENTS)
@@ -93,21 +103,21 @@ void read_image(uint16_t *data_ptr) {
             // uint8_t segment_number = seg;
             // uint16_t packet_number  = packet[1];
 
-            if (packet_number != pak) {
-                pak--;
-                resets++;
+            // if (packet_number != pak) {
+            //     pak--;
+            //     resets++;
 
-                if (resets > 100) {
-                    fprintf(stderr, "reseting spi...\n");
-                    resets = 0;
-                    seg = 1;
-                    pak = 0;
-                    close(spi_fd);
-                    usleep(185*1000);
-                    open_spi_port(spi_path);
-                }
-                continue;
-            }
+            //     if (resets > 100) {
+            //         fprintf(stderr, "reseting spi...\n");
+            //         resets = 0;
+            //         seg = 1;
+            //         pak = 0;
+            //         close(spi_fd);
+            //         usleep(185*1000);
+            //         open_spi_port(spi_path);
+            //     }
+            //     continue;
+            // }
 
             size_t offset = 80*pak + 60*80*(seg-1);
 
@@ -156,12 +166,8 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // // just try and flush the line
-    // for (int i = 0; i < 1000; i++)
-    //     read(spi_fd, packet, PACKET_SIZE);
-
-    // read the line a lot
-    for (int i = 0; i < 30; i++)
+    // // read the line a lot
+    // for (int i = 0; i < 30; i++)
         read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {

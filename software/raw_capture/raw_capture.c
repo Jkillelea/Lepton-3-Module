@@ -34,7 +34,7 @@ static LEP_CAMERA_PORT_DESC_T i2c_port;
 
 // SPI protocol vars
 static int     spi_fd    = -1;
-static int     spi_speed = 10000000;
+static int     spi_speed = 20000000;
 static uint8_t spi_mode  = SPI_MODE_3;
 static char    spi_path[255];
 static uint8_t spi_bits_per_word = 8;

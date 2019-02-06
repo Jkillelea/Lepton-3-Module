@@ -92,9 +92,9 @@ int main(int argc, char *argv[]) {
         read(spi_fd, packet, PACKET_SIZE);
         segment_number = (packet[0] >> 4) & 0b00000111;
         packet_number  = (packet[0] << 4) | packet[1];
-    } while (segment_number != 0 && packet_number != 0);
+    } while (segment_number != 1 && packet_number != 0);
 
-    for (uint32_t seg = 0; seg < NUM_SEGMENTS; seg++) {
+    for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
             //     continue;
             // }
 
-            size_t offset = 80*pak + 60*80*seg;
+            size_t offset = 80*pak + 60*80*(seg-1);
 
             fprintf(stderr, "%d %d\n", offset, sizeof(image)/sizeof(uint16_t));
 

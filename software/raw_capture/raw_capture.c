@@ -72,9 +72,6 @@ int main(int argc, char *argv[]) {
     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
         pabort("Couldn't open i2c port!");
 
-    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
-        pabort("Couldn't open i2c port!");
-
     if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
         pabort("Couldn't disable telemetry!");
 
@@ -102,7 +99,7 @@ int main(int argc, char *argv[]) {
             // Handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 fprintf(stderr, "drop %x\n", packet[0]);
-                // pak--;
+                pak--;
                 continue;
             }
 

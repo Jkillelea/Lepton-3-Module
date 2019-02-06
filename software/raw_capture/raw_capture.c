@@ -74,7 +74,7 @@ void read_image(uint16_t *data_ptr) {
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
             if (pak != packet_number) {
-                pak--;
+                pak = -1;
                 continue;
             }
 

@@ -135,10 +135,10 @@ void LeptonThread::run() {
 			result[i*2] = result[i*2+1];
 			result[i*2+1] = temp;
 			
-			// value = frameBuffer[i];
-			// if (value > maxValue) {
-			// 	maxValue = value;
-			// }
+			value = frameBuffer[i];
+			if (value > maxValue) {
+				maxValue = value;
+			}
 
 			// if (value < minValue) {
 			// 	if (value != 0)
@@ -173,13 +173,10 @@ void LeptonThread::run() {
 				myImage.setPixel(column, row, color);
 				
 		}
-		//lets emit the signal for update
+
+		// emit the signal for update
 		emit updateImage(myImage);
 		frame++;
-		/*if(frame == 5){
-			snapshot();
-			//abort();
-		}*/
 	}
 	
 	//finally, close SPI port just bcuz

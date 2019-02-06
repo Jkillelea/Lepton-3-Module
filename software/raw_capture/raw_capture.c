@@ -77,12 +77,12 @@ void read_image(uint16_t *data_ptr) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
-                fprintf(stderr, "drop (%x)\n", packet[0]);
-                pak--;
-                continue;
-            } 
+            // // handle drop packets
+            // if ((packet[0] & 0x0f) == 0x0f) {
+            //     fprintf(stderr, "drop (%x)\n", packet[0]);
+            //     pak--;
+            //     continue;
+            // } 
 
             fprintf(stderr, "%d.%d ", seg, pak);
 
@@ -90,6 +90,8 @@ void read_image(uint16_t *data_ptr) {
             segment_number = (packet[0] >> 4) & 0b00000111;
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
+            if (packet_number == 20 && segment_number == 0)
+                continue;
 
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 

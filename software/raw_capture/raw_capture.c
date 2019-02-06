@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
             if ((packet[0] & 0x0f) == 0x0f) { // Handle drop packets
-                fprintf(stderr, "drop (%x)", packet[0]);
+                fprintf(stderr, "drop (%x)\n", packet[0]);
                 pak--;
                 continue;
             } else {
@@ -110,9 +110,9 @@ int main(int argc, char *argv[]) {
 
             // Warn on bounds error
             if (segment_number < 0 || segment_number > NUM_SEGMENTS)
-                fprintf(stderr, "\tsegment number out of bounds");
+                fprintf(stderr, "\tsegment number out of bounds\n");
             if (segment_number > PACKETS_PER_SEGMENT)
-                fprintf(stderr, "\tpacket number out of bounds");
+                fprintf(stderr, "\tpacket number out of bounds\n");
 
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
             // uint16_t packet_number = (packet[0] << 4) | packet[1];

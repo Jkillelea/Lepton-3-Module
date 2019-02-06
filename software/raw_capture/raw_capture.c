@@ -52,7 +52,7 @@ void read_image(uint16_t *data_ptr) {
     uint16_t packet_number = 0;
 
     // sync up to frame 1.0
-    while (true) {
+    for (int i = 0; i < 1000; i++) {
         // Read SPI
         if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
             fprintf(stderr, "SPI failed to read enough bytes!\n");

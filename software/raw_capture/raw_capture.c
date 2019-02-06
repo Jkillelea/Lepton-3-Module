@@ -124,11 +124,11 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
+            size_t offset = 80*(pak+1) + 4800*(seg-1);
+
             size_t max_offset = sizeof(image) / sizeof(uint16_t);
-            size_t offset = 80*pak + 60*80*(seg-1);
             fprintf(stderr, "%d %d\n", offset, max_offset);
 
             if (offset+80 > max_offset)

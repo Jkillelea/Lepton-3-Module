@@ -93,9 +93,6 @@ void read_image(uint16_t *data_ptr) {
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
 
-            // if (packet_number == 20 && segment_number == 0)
-            //     continue;
-
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
             size_t offset = 80*pak + 60*80*(seg-1);

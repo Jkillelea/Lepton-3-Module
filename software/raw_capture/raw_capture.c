@@ -112,41 +112,26 @@ int main(int argc, char *argv[]) {
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
             uint16_t packet_number  = packet[1];
 
-            if (segment_number == 0) {
-                seg = 1;
-                pak = 0;
-                continue;
-            }
 
             if (packet_number == 20) {
                 segment_number = (packet[0] >> 4) & 0b00000111;
                 seg = segment_number;
                 pak = packet_number;
+                if (segment_number == 0) {
+                    seg = 1;
+                    pak = 0;
+                    continue;
+                }
             }
+
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            // if (packet_number != pak) {
-            //     pak--;
-            //     resets++;
-            //     usleep(1000);
-            //     if (resets == 100) {
-            //         resets = 0;
-            //         fprintf(stderr, "Restarting SPI\n");
-            //         close(spi_fd);
-            //         usleep(200000); // 200ms
-            //         open_spi_port(spi_path);
-            //     }
-            //     continue;
-            // }
-
-            size_t offset = 80*pak + 60*80*(seg-1);
-
             size_t max_offset = sizeof(image) / sizeof(uint16_t);
-
+            size_t offset = 80*pak + 60*80*(seg-1);
             fprintf(stderr, "%d %d\n", offset, max_offset);
 
-            if (offset > max_offset)
+            if (offset+80 > max_offset)
                 continue;
 
             for (int i = 0; i < 80; i++) {

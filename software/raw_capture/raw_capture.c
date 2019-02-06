@@ -63,6 +63,9 @@ void read_image(uint16_t *data_ptr) {
         packet_number  = ((packet[0] & 0x0f) << 4) 
                          | packet[1];
 
+        // handle drop packets
+        if ((packet[0] & 0x0f) == 0x0f)
+            continue;
     }
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {

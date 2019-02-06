@@ -108,6 +108,11 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
             }
 
+            // skip segment number 0 (from datasheet)
+            if (segment_number == 0)
+                continue;
+
+            // set seg on packet number 20 (from datasheet)
             if (packet_number == 20 && segment_number >= 1)
                 seg = segment_number;
 
@@ -141,7 +146,6 @@ int main(int argc, char *argv[]) {
             //     }
             //     continue;
             // }
-
 
             size_t offset = 80*pak + 60*80*(seg-1);
 

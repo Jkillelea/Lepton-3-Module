@@ -67,11 +67,6 @@ void read_image(uint16_t *data_ptr) {
             //     continue;
             // } 
 
-            if ((packet[0] & 0x0f) == 0x0f) {
-                pak--;
-                continue;
-            }
-
             fprintf(stderr, "%d.%d ", seg, pak);
 
             // get segment and packet number
@@ -79,7 +74,7 @@ void read_image(uint16_t *data_ptr) {
             packet_number  = (packet[0] & 0x0f) | packet[1];
             if (packet_number == 20) {
                 seg = segment_number;
-                // pak = packet_number;
+                pak = packet_number;
             }
             // packet_number  = (packet[0] << 4) | packet[1];
 

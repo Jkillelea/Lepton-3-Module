@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
             // Handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
+            if ((packet[0] & 0x0f) != 0x0f) {
                 pak--;
                 continue;
             }

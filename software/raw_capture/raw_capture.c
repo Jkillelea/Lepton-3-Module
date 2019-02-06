@@ -101,15 +101,12 @@ int main(int argc, char *argv[]) {
 
             uint8_t segment_number = seg;
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-            // uint16_t packet_number = (packet[0] << 4) | packet[1];
-            uint16_t packet_number  = packet[1];
+            uint16_t packet_number = (packet[0] << 4) | packet[1];
+            // uint16_t packet_number  = packet[1];
 
             if (packet_number != pak) {
                 fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
-
-                // pak--;
-                pak = packet_number;
-
+                pak--;
                 resets++;
 
                 if (resets > 100) {
@@ -118,7 +115,7 @@ int main(int argc, char *argv[]) {
                     seg = 1;
                     pak = 0;
                     close(spi_fd);
-                    usleep(200000);
+                    usleep(185*1000);
                     open_spi_port(spi_path);
                 }
                 continue;
@@ -126,7 +123,7 @@ int main(int argc, char *argv[]) {
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            size_t offset = 80*packet_number + 4800*(segment_number-1);
+            size_t offset = 80*packet_number + 60*80*(segment_number-1);
 
             // fprintf(stderr, "%d %d\n", offset, max_offset);
 

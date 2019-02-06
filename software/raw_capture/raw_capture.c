@@ -54,7 +54,6 @@ void read_image(uint16_t *data_ptr) {
             uint8_t  segment_number;
             uint16_t packet_number;
 
-
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
@@ -83,10 +82,6 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             }
 
-            // set seg on packet number 20 (from datasheet)
-            if (packet_number == 20 && segment_number >= 1)
-                seg = segment_number;
-
             // // Warn on bounds error
             // if (segment_number < 0 || segment_number > NUM_SEGMENTS)
             //     fprintf(stderr, "\tsegment number out of bounds\n");
@@ -98,25 +93,25 @@ void read_image(uint16_t *data_ptr) {
             // uint8_t segment_number = seg;
             // uint16_t packet_number  = packet[1];
 
-            // if (packet_number != pak) {
-            //     fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
-            //     if (packet_number < pak)
-            //         pak = packet_number;
+            if (packet_number != pak) {
+                fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
+                if (packet_number < pak)
+                    pak = packet_number;
 
-            //     pak--;
-            //     resets++;
+                pak--;
+                resets++;
 
-            //     if (resets > 100) {
-            //         fprintf(stderr, "reseting spi...\n");
-            //         resets = 0;
-            //         seg = 1;
-            //         pak = 0;
-            //         close(spi_fd);
-            //         usleep(185*1000);
-            //         open_spi_port(spi_path);
-            //     }
-            //     continue;
-            // }
+                if (resets > 100) {
+                    fprintf(stderr, "reseting spi...\n");
+                    resets = 0;
+                    seg = 1;
+                    pak = 0;
+                    close(spi_fd);
+                    usleep(185*1000);
+                    open_spi_port(spi_path);
+                }
+                continue;
+            }
 
             size_t offset = 80*pak + 60*80*(seg-1);
 

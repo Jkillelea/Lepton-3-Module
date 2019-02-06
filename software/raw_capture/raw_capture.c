@@ -112,6 +112,20 @@ int main(int argc, char *argv[]) {
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
             uint16_t packet_number  = packet[1];
 
+            if (segment_number != seg) {
+                pak--;
+                resets++;
+
+                if (resets > 100) {
+                    resets = 0;
+                    seg = 1;
+                    pak = 0;
+                    close(spi_fd);
+                    usleep(200000);
+                    open_spi_port(spi_path);
+                }
+            }
+
             // if (packet_number == 20) {
             //     segment_number = (packet[0] >> 4) & 0b00000111;
             //     if (segment_number == 0) {

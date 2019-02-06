@@ -88,11 +88,11 @@ int main(int argc, char *argv[]) {
     // try and sync up
     uint8_t segment_number;
     uint16_t packet_number;
-    // do {
-    //     read(spi_fd, packet, PACKET_SIZE);
-    //     segment_number = (packet[0] >> 4) & 0b00000111;
-    //     packet_number  = (packet[0] << 4) | packet[1];
-    // } while (segment_number != 1 && packet_number != 0);
+    do {
+        read(spi_fd, packet, PACKET_SIZE);
+        segment_number = (packet[0] >> 4) & 0b00000111;
+        packet_number  = (packet[0] << 4) | packet[1];
+    } while (segment_number != 1 && packet_number != 0);
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
@@ -100,29 +100,28 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // Handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
-                fprintf(stderr, "drop %x\n", packet[0]);
-                pak--;
-                continue;
-            }
+            // // Handle drop packets
+            // if ((packet[0] & 0x0f) == 0x0f) {
+            //     fprintf(stderr, "drop %x\n", packet[0]);
+            //     pak--;
+            //     continue;
+            // }
 
             uint8_t  segment_number = seg;
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
             uint16_t packet_number  = packet[1];
 
-            pak = packet_number;
 
             if (packet_number == 20) {
                 segment_number = (packet[0] >> 4) & 0b00000111;
                 seg = segment_number;
-                // pak = packet_number;
-                // if (segment_number == 0) {
-                //     seg = 1;
-                //     pak = 0;
-                //     continue;
-                // }
+                pak = packet_number;
+                if (segment_number == 0) {
+                    seg = 1;
+                    pak = 0;
+                    continue;
+                }
             }
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);

@@ -79,7 +79,7 @@ void read_image(uint16_t *data_ptr) {
             }
 
 
-            if (packet_number = 20) {
+            if (packet_number == 20) {
                 if (0 < segment_number && segment_number < 5)
                     seg = segment_number;
             }

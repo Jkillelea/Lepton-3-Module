@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
             // Handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 pak--;
-                fprintf(stderr, "drop\n");
+                fprintf(stderr, "drop %x\n", packet[0]);
                 continue;
             } else {
                 fprintf(stderr, "\n");

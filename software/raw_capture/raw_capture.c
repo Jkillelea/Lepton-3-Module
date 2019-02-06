@@ -41,7 +41,6 @@ static uint8_t spi_bits_per_word = 8;
 
 // SPI communication vars
 static uint8_t packet[PACKET_SIZE] = {0x0};
-static int resets = 0;
 
 // Functions
 static void pabort(const char *s);
@@ -62,12 +61,14 @@ void read_image(uint16_t *data_ptr) {
         segment_number = (packet[0] >> 4) & 0b00000111;
         packet_number  = ((packet[0] & 0x0f) << 4) | packet[1];
 
-        if ((packet[0] & 0x0f) == 0x0f) { // handle drop packets
+        if ((packet[0] & 0x0f) == 0x0f)
             continue;
-        } else if (segment_number == 1 && packet_number == 0) { // exit on 1.0
-            break;
-        }
 
+        bool should_break = (segment_number == 1)
+                         && (packet_number == 0);
+
+         if (should_break)
+             break;
     }
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {

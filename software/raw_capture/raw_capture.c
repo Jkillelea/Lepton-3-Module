@@ -83,6 +83,10 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
+    // just try and flush the caches
+    for (int i = 0; i < 1000; i++)
+        read(spi_fd, packet, PACKET_SIZE);
+
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
             uint8_t  segment_number;

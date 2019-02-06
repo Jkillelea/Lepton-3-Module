@@ -72,20 +72,13 @@ void read_image(uint16_t *data_ptr) {
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
 
-            // if (packet_number == 20) {
-            //     seg = segment_number;
-            //     pak = packet_number + 1;
-            //     continue;
-            // }
-            // packet_number  = (packet[0] << 4) | packet[1];
-
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-            // // skip segment number 0 (from datasheet)
-            // if (segment_number == 0) {
-            //     pak--;
-            //     continue;
-            // }
+            // skip segment number 0 (from datasheet)
+            if (segment_number == 0) {
+                pak--;
+                continue;
+            }
 
             // if (packet_number != pak) {
             //     pak--;

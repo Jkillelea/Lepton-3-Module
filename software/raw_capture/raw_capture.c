@@ -137,6 +137,8 @@ int main(int argc, char *argv[]) {
 
             size_t offset = 80*pak + 60*80*seg;
 
+            fprintf(stderr, "%d\n", offset);
+
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;
                 image_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];

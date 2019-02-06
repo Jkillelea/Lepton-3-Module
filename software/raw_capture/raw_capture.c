@@ -60,12 +60,12 @@ void read_image(uint16_t *data_ptr) {
 
             // fprintf(stderr, "%x %x ", packet[0], packet[1]);
 
-            // handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
-                fprintf(stderr, "drop (%x)\n", packet[0]);
-                pak--;
-                continue;
-            } 
+            // // handle drop packets
+            // if ((packet[0] & 0x0f) == 0x0f) {
+            //     fprintf(stderr, "drop (%x)\n", packet[0]);
+            //     pak--;
+            //     continue;
+            // } 
 
             fprintf(stderr, "%d.%d ", seg, pak);
 
@@ -76,11 +76,11 @@ void read_image(uint16_t *data_ptr) {
 
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-            // skip segment number 0 (from datasheet)
-            if (segment_number == 0) {
-                pak--;
-                continue;
-            }
+            // // skip segment number 0 (from datasheet)
+            // if (segment_number == 0) {
+            //     pak--;
+            //     continue;
+            // }
 
             // // Warn on bounds error
             // if (segment_number < 0 || segment_number > NUM_SEGMENTS)
@@ -95,8 +95,6 @@ void read_image(uint16_t *data_ptr) {
 
             if (packet_number != pak) {
                 fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
-                if (packet_number < pak)
-                    pak = packet_number;
 
                 pak--;
                 resets++;

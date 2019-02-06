@@ -104,11 +104,11 @@ int main(int argc, char *argv[]) {
                 pak--;
                 resets++;
                 usleep(1000);
-                if (resets == 100) {
+                if (resets == 1000) {
                     resets = 0;
                     close(spi_fd);
                     fprintf(stderr, "Restarting SPI\n");
-                    usleep(185*1000);
+                    usleep(185*10000);
                     open_spi_port(spi_path);
                 }
                 continue;

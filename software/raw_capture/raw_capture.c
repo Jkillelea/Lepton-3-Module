@@ -113,7 +113,6 @@ int main(int argc, char *argv[]) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
                     close(spi_fd);
-                    lepton_reboot_and_configure();
                     usleep(5000);
                     open_spi_port(spi_path);
                 }

@@ -71,10 +71,10 @@ void read_image(uint16_t *data_ptr) {
             segment_number = (packet[0] >> 4) & 0b00000111;
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
+
             if (packet_number == 20) {
                 seg = segment_number;
-                pak = packet_number;
-                pak--;
+                pak = packet_number - 1;
             }
             // packet_number  = (packet[0] << 4) | packet[1];
 
@@ -86,10 +86,10 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             }
 
-            if (packet_number != pak) {
-                pak--;
-                continue;
-            }
+            // if (packet_number != pak) {
+            //     pak--;
+            //     continue;
+            // }
 
             // // Warn on bounds error
             // if (segment_number < 0 || segment_number > NUM_SEGMENTS)

@@ -76,7 +76,7 @@ void read_image(uint16_t *data_ptr) {
 
             // get segment and packet number
             segment_number = (packet[0] >> 4) & 0b00000111;
-            packet_number  = packet[1];
+            packet_number  = (packet[0] & 0x0f) | packet[1];
             if (packet_number == 20) {
                 seg = segment_number;
                 // pak = packet_number;

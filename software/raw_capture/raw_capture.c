@@ -126,25 +126,13 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            // if (packet_number == 20) {
-            //     segment_number = (packet[0] >> 4) & 0b00000111;
-            //     if (segment_number == 0) {
-            //         seg = 1;
-            //         pak = 0;
-            //         continue;
-            //     } else {
-            //         seg = segment_number;
-            //         pak = packet_number;
-            //     }
-            // }
-
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             size_t offset = 80*packet_number + 4800*(segment_number-1);
+
             size_t max_offset = sizeof(image) / sizeof(uint16_t);
 
-            fprintf(stderr, "%d %d\n", offset, max_offset);
-
+            // fprintf(stderr, "%d %d\n", offset, max_offset);
             // if (offset > max_offset)
             //     continue;
 

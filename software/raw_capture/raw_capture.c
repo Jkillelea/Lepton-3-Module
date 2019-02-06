@@ -51,7 +51,7 @@ void read_image(uint16_t *data_ptr) {
     uint8_t  segment_number = 0;
     uint16_t packet_number = 0;
 
-    // sync up to frame 1.0
+    // sync up to frame 1.20
     for (int i = 0; i < 10000; i++) {
         // Read SPI
         if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
@@ -64,10 +64,7 @@ void read_image(uint16_t *data_ptr) {
         if ((packet[0] & 0x0f) == 0x0f)
             continue;
 
-        bool should_break = (segment_number == 1)
-                         && (packet_number == 0);
-
-         if (should_break)
+         if (segment_number == 1 && packet_number == 20)
              break;
     }
 
@@ -80,7 +77,7 @@ void read_image(uint16_t *data_ptr) {
             // handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 fprintf(stderr, "drop (%x)\n", packet[0]);
-                pak--;
+                // pak--;
                 continue;
             } 
 

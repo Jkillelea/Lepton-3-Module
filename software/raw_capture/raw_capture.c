@@ -115,14 +115,12 @@ int main(int argc, char *argv[]) {
                 pak = packet_number;
             }
 
-
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             if (packet_number != pak) {
                 pak--;
                 resets++;
                 usleep(1000);
-                continue;
                 if (resets == 100) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
@@ -130,6 +128,7 @@ int main(int argc, char *argv[]) {
                     usleep(200000); // 200ms
                     open_spi_port(spi_path);
                 }
+                continue;
             }
 
             size_t offset = 80*pak + 60*80*seg;

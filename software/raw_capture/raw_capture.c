@@ -48,10 +48,10 @@ static int open_spi_port(const char *path);
 static int set_spi_number(const char *arg);
 
 void read_image(uint16_t *data_ptr) {
-    static uint32_t mismatches = 0;
-    uint8_t segment_number     = 0;
-    int16_t packet_number      = 0;
-    int32_t seg, pak           = 0;
+    static uint32_t mismatches = 0; // number of times gotten out of sync
+    uint8_t segment_number     = 0; // segment number from SPI packet
+    int16_t packet_number      = 0; // packet number from SPI packet
+    int32_t seg, pak           = 0; // loop vars
 
     for (seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
@@ -72,7 +72,7 @@ void read_image(uint16_t *data_ptr) {
 
             fprintf(stderr, "%d got %d\n", pak, packet_number);
 
-            if (pak != packet_number) {
+            if (pak != packet_number) { // out of sync
                 pak = -1;
                 mismatches++;
                 if (mismatches == 100) {
@@ -84,13 +84,14 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             }
 
-            if (pak == 20) {
+            if (pak == 20) { // segment number is only valid on packet 20
                 if (0 < segment_number && segment_number < 5) {
                     seg = segment_number; 
                 }
                 fprintf(stderr, "segment %d\n", seg);
             }
 
+            // Copy the image data from the SPI packet
             // Can't use a straight memcpy since we have to account for endianness
             // when copying over. Lepton SPI is big endian and the pi's armv7l 
             // processor is little endian
@@ -104,6 +105,7 @@ void read_image(uint16_t *data_ptr) {
 }
 
 int main(int argc, char *argv[]) {
+    // setup
     memset(image_ptr, 0, IMAGE_HEIGHT*IMAGE_WIDTH*sizeof(uint16_t));
 
     // parse opts
@@ -128,9 +130,11 @@ int main(int argc, char *argv[]) {
     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
         pabort("Couldn't open i2c port!");
 
+    // Disable telemetry (changes packet lengths)
     if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
         pabort("Couldn't disable telemetry!");
 
+    // Enable radiometry
     if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
         pabort("Couldn't enable radiometry!");
 
@@ -140,9 +144,11 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    for (int i = 0; i < 5; i++)
-        read_image(image_ptr);
+    // Read the image
+    // for (int i = 0; i < 5; i++)
+    read_image(image_ptr);
 
+    // Print to stdout
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {
             printf("%d ", image[i][j]);
@@ -154,6 +160,7 @@ int main(int argc, char *argv[]) {
 }
 
 
+// read argv for spi number (should be 0 or 1)
 static int set_spi_number(const char *arg) {
     int spi_number = atoi(arg);
     switch (spi_number) { // SPI bus number
@@ -171,6 +178,7 @@ static int set_spi_number(const char *arg) {
     return 0;
 }
 
+// Open SPI port and do all the ioctl setup
 static int open_spi_port(const char *path) {
     int ret;
 	int spi_fd = open(path, O_RDWR);
@@ -203,7 +211,7 @@ static int open_spi_port(const char *path) {
     return spi_fd;
 }
 
-
+// Exit program with error message
 static void pabort(const char *s) {
 	perror(s);
 	abort();

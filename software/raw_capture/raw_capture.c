@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
             }
 
 
-            size_t offset = 80*packet_number + 60*80*segment_number;
+            size_t offset = 80*pak + 60*80*seg;
             // fprintf(stderr, "offset: %d\n", offset);
 
             for (int i = 0; i < 80; i++) {

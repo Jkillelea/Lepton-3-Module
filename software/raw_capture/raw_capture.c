@@ -142,7 +142,12 @@ int main(int argc, char *argv[]) {
 
             size_t offset = 80*pak + 60*80*(seg-1);
 
-            fprintf(stderr, "%d %d\n", offset, sizeof(image)/sizeof(uint16_t));
+            size_t max_offset = sizeof(image) / sizeof(uint16_t);
+
+            fprintf(stderr, "%d %d\n", offset, max_offset);
+
+            if (offset > max_offset)
+                continue;
 
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;

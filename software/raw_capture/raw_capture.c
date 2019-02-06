@@ -106,7 +106,10 @@ int main(int argc, char *argv[]) {
 
             if (packet_number != pak) {
                 fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
-                pak--;
+                if (packet_number < pak)
+                    pak = packet_number;
+
+                // pak--;
                 resets++;
 
                 if (resets > 100) {

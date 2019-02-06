@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
                 // continue;
             }
 
-            uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
+            uint8_t segment_number = packet[0] >> 4;
             uint16_t packet_number = packet[1];
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
 
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
                     close(spi_fd);
-                    usleep(50000);
+                    usleep(200000); // 200ms
                     open_spi_port(spi_path);
                 }
             }

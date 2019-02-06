@@ -41,6 +41,7 @@ static uint8_t spi_bits_per_word = 8;
 
 // SPI communication vars
 static uint8_t packet[PACKET_SIZE] = {0x0};
+static uint32_t mismatches = 0;
 
 // Functions
 static void pabort(const char *s);
@@ -67,8 +68,6 @@ void read_image(uint16_t *data_ptr) {
 
             // get segment and packet number
             segment_number = (packet[0] >> 4) & 0b00000111;
-            // packet_number  = ((packet[0] & 0x0f) << 4) 
-            //                  | packet[1];
             packet_number = packet[1];
 
             // fprintf(stderr, "%d.%d ", seg, pak);
@@ -77,15 +76,22 @@ void read_image(uint16_t *data_ptr) {
 
             if (pak != packet_number) {
                 pak = -1;
+                mismatches++;
+
+                if (mismatches == 100) {
+                    mismatches = 0;
+                    close(spi_fd);
+                    usleep(200*1000);
+                    open_spi_port(spi_path);
+                }
                 continue;
             }
 
-
             if (packet_number == 20) {
                 fprintf(stderr, "segment %d\n", seg);
-                // if (0 < segment_number && segment_number < 5) {
-                //     seg = segment_number; 
-                // }
+                if (0 < segment_number && segment_number < 5) {
+                    seg = segment_number; 
+                }
             }
 
             // can't use a straight memcpy since we have to account for endianness

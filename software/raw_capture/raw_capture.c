@@ -99,20 +99,18 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
+            // Handle drop packets
+            if ((packet[0] & 0x0f) == 0x0f) {
+                fprintf(stderr, "drop %x\n", packet[0]);
+                pak--;
+                continue;
+            }
+
             uint8_t segment_number = packet[0] >> 4;
             uint16_t packet_number = packet[1];
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
 
-            fprintf(stderr, "%d %d ", segment_number, packet_number);
-
-            // Handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
-                pak--;
-                fprintf(stderr, "drop %x\n", packet[0]);
-                continue;
-            } else {
-                fprintf(stderr, "\n");
-            }
+            fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             if (packet_number != pak) {
                 pak--;

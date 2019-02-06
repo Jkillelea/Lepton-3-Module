@@ -75,7 +75,7 @@ void read_image(uint16_t *data_ptr) {
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
             // skip segment number 0 (from datasheet)
-            if (segment_number == 0) {
+            if (packet_number == 20 && segment_number == 0) {
                 pak--;
                 continue;
             }

@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
             }
 
             uint8_t segment_number = (packet[0] >> 4) | 0b00000011;
-            uint16_t packet_number = packet[1];
-            // uint16_t packet_number = (packet[0] << 4) | packet[1];
+            // uint16_t packet_number = packet[1];
+            uint16_t packet_number = (packet[0] << 4) | packet[1];
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 

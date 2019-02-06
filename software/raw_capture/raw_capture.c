@@ -88,6 +88,12 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
+    // try and sync up
+    do {
+        if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
+            fprintf(stderr, "SPI failed to read enough bytes!\n");
+    } while ((packet[0] & 0x0f) == 0x0f);
+
     for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
         for (int pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 

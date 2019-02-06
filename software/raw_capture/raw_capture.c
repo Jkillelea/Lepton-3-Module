@@ -113,7 +113,8 @@ int main(int argc, char *argv[]) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
                     close(spi_fd);
-                    usleep(5000);
+                    // usleep(5000);
+                    sleep(1);
                     open_spi_port(spi_path);
                 }
                 continue;

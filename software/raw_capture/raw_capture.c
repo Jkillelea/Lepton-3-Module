@@ -103,13 +103,15 @@ int main(int argc, char *argv[]) {
             uint16_t packet_number = packet[1];
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
 
-            fprintf(stderr, "%d %d\n", segment_number, packet_number);
+            fprintf(stderr, "%d %d ", segment_number, packet_number);
 
             // Handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 pak--;
                 fprintf(stderr, "drop\n");
                 continue;
+            } else {
+                fprintf(stderr, "\n");
             }
 
             if (packet_number != pak) {

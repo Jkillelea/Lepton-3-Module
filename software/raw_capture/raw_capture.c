@@ -104,7 +104,6 @@ int main(int argc, char *argv[]) {
             uint16_t packet_number = packet[1];
             uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
 
-            // fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             if (packet_number != pak) {
                 pak--;
@@ -123,6 +122,8 @@ int main(int argc, char *argv[]) {
 
             if (packet_number > 60 || segment_number > 3)
                 continue;
+
+            fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
             size_t offset = 80*packet_number + 60*80*segment_number;
             // fprintf(stderr, "offset: %d\n", offset);

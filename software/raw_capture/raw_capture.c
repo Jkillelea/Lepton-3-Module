@@ -57,8 +57,10 @@ int main(int argc, char *argv[]) {
     // I2C bus number
     switch (atoi(argv[1])) {
         case 0:
+            i2c_number = 0;
             break;
         case 1:
+            i2c_number = 1;
             break;
         default:
             pabort("Need to define I2C number as 0 or 1");
@@ -87,7 +89,6 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-
             // Handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
                 pak--;
@@ -99,19 +100,19 @@ int main(int argc, char *argv[]) {
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            // if (packet_number != pak) {
-            //     pak--;
-            //     resets++;
-            //     usleep(1000);
-            //     if (resets == 100) {
-            //         resets = 0;
-            //         close(spi_fd);
-            //         fprintf(stderr, "Restarting SPI\n");
-            //         usleep(185*1000);
-            //         open_spi_port(spi_path);
-            //     }
-            //     continue;
-            // }
+            if (packet_number != pak) {
+                pak--;
+                resets++;
+                usleep(1000);
+                if (resets == 100) {
+                    resets = 0;
+                    close(spi_fd);
+                    fprintf(stderr, "Restarting SPI\n");
+                    usleep(185*1000);
+                    open_spi_port(spi_path);
+                }
+                continue;
+            }
 
             fprintf(stderr, "offset: %d\n", offset);
 

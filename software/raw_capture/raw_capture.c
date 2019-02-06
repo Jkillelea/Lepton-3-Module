@@ -54,7 +54,6 @@ void read_image(uint16_t *data_ptr) {
             uint8_t  segment_number;
             uint16_t packet_number;
 
-            memset(*image_ptr, 0, IMAGE_HEIGHT*IMAGE_WIDTH*sizeof(uint16_t));
 
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
@@ -78,7 +77,6 @@ void read_image(uint16_t *data_ptr) {
 
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-
             // skip segment number 0 (from datasheet)
             if (segment_number == 0) {
                 pak--;
@@ -89,11 +87,11 @@ void read_image(uint16_t *data_ptr) {
             if (packet_number == 20 && segment_number >= 1)
                 seg = segment_number;
 
-            // Warn on bounds error
-            if (segment_number < 0 || segment_number > NUM_SEGMENTS)
-                fprintf(stderr, "\tsegment number out of bounds\n");
-            if (segment_number > PACKETS_PER_SEGMENT)
-                fprintf(stderr, "\tpacket number out of bounds\n");
+            // // Warn on bounds error
+            // if (segment_number < 0 || segment_number > NUM_SEGMENTS)
+            //     fprintf(stderr, "\tsegment number out of bounds\n");
+            // if (segment_number > PACKETS_PER_SEGMENT)
+            //     fprintf(stderr, "\tpacket number out of bounds\n");
 
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
@@ -131,6 +129,8 @@ void read_image(uint16_t *data_ptr) {
 }
 
 int main(int argc, char *argv[]) {
+    memset(image_ptr, 0, IMAGE_HEIGHT*IMAGE_WIDTH*sizeof(uint16_t));
+
     // parse opts
     if (argc < 3) {
         fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
@@ -165,12 +165,12 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    // just try and flush the line
-    for (int i = 0; i < 1000; i++)
-        read(spi_fd, packet, PACKET_SIZE);
+    // // just try and flush the line
+    // for (int i = 0; i < 1000; i++)
+    //     read(spi_fd, packet, PACKET_SIZE);
 
     // read the line a lot
-    for (int i = 0; i < 60; i++)
+    for (int i = 0; i < 30; i++)
         read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {

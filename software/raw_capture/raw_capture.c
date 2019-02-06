@@ -81,9 +81,9 @@ void read_image(uint16_t *data_ptr) {
 
 
             if (packet_number == 20) {
+                fprintf(stderr, "segment %d\n", seg);
                 if (0 < segment_number && segment_number < 5) {
                     seg = segment_number; 
-                    fprintf(stderr, "segment %d\n", seg);
                 }
             }
 

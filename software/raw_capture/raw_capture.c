@@ -126,6 +126,11 @@ int main(int argc, char *argv[]) {
                 }
             }
 
+            if (segment_number >= NUM_SEGMENTS)
+                continue;
+            if (packet_number >= PACKETS_PER_SEGMENT)
+                continue;
+
             size_t offset = 80*packet_number + 60*80*segment_number;
             // fprintf(stderr, "offset: %d\n", offset);
 

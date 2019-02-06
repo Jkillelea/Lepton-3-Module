@@ -168,7 +168,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < 1000; i++)
         read(spi_fd, packet, PACKET_SIZE);
 
-    read_image(image_ptr);
+    // read the line a lot
+    for (int i = 0; i < 60; i++)
+        read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {

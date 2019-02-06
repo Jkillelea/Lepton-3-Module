@@ -105,10 +105,15 @@ int main(int argc, char *argv[]) {
             uint16_t packet_number  = packet[1];
 
             if (packet_number != pak) {
-                pak--;
+                fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
+
+                if (pak > 0)
+                    pak--;
+
                 resets++;
 
                 if (resets > 100) {
+                    fprintf(stderr, "reseting spi...\n");
                     resets = 0;
                     seg = 1;
                     pak = 0;

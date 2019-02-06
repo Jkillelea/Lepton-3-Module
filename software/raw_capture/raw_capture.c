@@ -136,27 +136,12 @@ int main(int argc, char *argv[]) {
 
     spi_fd = open_spi_port(spi_path);
 
-    read_image(image_ptr);
-
-    uint16_t max = 0;
-    uint16_t min = 0xffff;
+    for (int i = 0; i < 5; i++)
+        read_image(image_ptr);
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j = 0; j < IMAGE_WIDTH; j++) {
-            if (image[i][j] > max)
-                max = image[i][j];
-            if (image[i][j] < min)
-                min = image[i][j];
-        }
-    }
-
-    fprintf(stderr, "max %d min %d\n", max, min);
-
-    float delta = max - min;
-
-    for (int i = 0; i < IMAGE_HEIGHT; i++) {
-        for (int j = 0; j < IMAGE_WIDTH; j++) {
-            printf("%d ", (int) (255.0 * image[i][j] / delta) );
+            printf("%d ", image[i][j]);
         }
         printf("\n");
     }

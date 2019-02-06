@@ -89,6 +89,12 @@ void read_image(uint16_t *data_ptr) {
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
 
+            if (packet_number != pak)
+                pak = packet_number;
+
+            if (pak == 20)
+                seg = segment_number;
+
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
             size_t offset = 80*pak + 60*80*(seg-1);

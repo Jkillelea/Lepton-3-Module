@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
             // uint16_t packet_number = (packet[0] << 4) | packet[1];
             uint16_t packet_number  = packet[1];
 
-            if (segment_number != seg) {
+            if (packet_number != pak) {
                 pak--;
                 resets++;
 

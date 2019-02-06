@@ -10,6 +10,7 @@
 #include <linux/spi/spidev.h>
 
 #include <LEPTON_SDK.h>
+#include <LEPTON_OEM.h>
 #include <LEPTON_SYS.h>
 #include <LEPTON_RAD.h>
 #include <LEPTON_Types.h>
@@ -70,11 +71,15 @@ int main(int argc, char *argv[]) {
     if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
         pabort("Couldn't open i2c port!");
 
+    if (LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port) != LEP_OK)
+        pabort("Couldn't open i2c port!");
+
     if (LEP_SetSysTelemetryEnableState(&i2c_port, LEP_TELEMETRY_DISABLED) != LEP_OK)
         pabort("Couldn't disable telemetry!");
 
     if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
         pabort("Couldn't enable radiometry!");
+
 
     // SPI bus number
     if(set_spi_number(argv[2]) < 0)
@@ -107,6 +112,9 @@ int main(int argc, char *argv[]) {
                 if (resets == 1000) {
                     resets = 0;
                     close(spi_fd);
+                    LEP_RunOemReboot(&i2c_port);
+                    usleep(5000);
+                    LEP_OpenPort(i2c_number, LEP_CCI_TWI, 400, &i2c_port);
                     fprintf(stderr, "Restarting SPI\n");
                     usleep(5000);
                     open_spi_port(spi_path);

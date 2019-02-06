@@ -53,19 +53,21 @@ void read_image(uint16_t *data_ptr) {
     uint16_t packet_number = 0;
 
     // sync up to frame 1.0
-    while (packet_number != 1 && segment_number != 0) {
+    while (true) {
         // Read SPI
         if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
             fprintf(stderr, "SPI failed to read enough bytes!\n");
 
         // get segment and packet number
         segment_number = (packet[0] >> 4) & 0b00000111;
-        packet_number  = ((packet[0] & 0x0f) << 4) 
-                         | packet[1];
+        packet_number  = ((packet[0] & 0x0f) << 4) | packet[1];
 
-        // handle drop packets
-        if ((packet[0] & 0x0f) == 0x0f)
+        if ((packet[0] & 0x0f) == 0x0f) { // handle drop packets
             continue;
+        } else if (segment_number == 1 && packet_number == 0) { // exit on 1.0
+            break;
+        }
+
     }
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {

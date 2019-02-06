@@ -86,10 +86,12 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // try and sync up
+    uint8_t segment_number;
+    uint16_t packet_number;
     do {
         read(spi_fd, packet, PACKET_SIZE);
-        uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-        uint16_t packet_number = (packet[0] << 4) | packet[1];
+        segment_number = (packet[0] >> 4) & 0b00000111;
+        packet_number  = (packet[0] << 4) | packet[1];
     } while (segment_number != 0 && packet_number != 0);
 
     for (uint32_t seg = 0; seg < NUM_SEGMENTS; seg++) {

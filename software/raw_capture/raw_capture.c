@@ -70,8 +70,9 @@ void read_image(uint16_t *data_ptr) {
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
 
-            fprintf(stderr, "%d.%d ", seg, pak);
-            fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
+            // fprintf(stderr, "%d.%d ", seg, pak);
+            // fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
+            fprintf(stderr, "%d got %d\n", pak, packet_number);
 
             if (pak != packet_number) {
                 pak = -1;

@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
 
     for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
         for (int pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
-            size_t offset = 80*pak + 60*80*seg;
 
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
@@ -104,16 +103,17 @@ int main(int argc, char *argv[]) {
                 pak--;
                 resets++;
                 usleep(1000);
+                continue;
                 if (resets == 1000) {
                     resets = 0;
                     close(spi_fd);
                     fprintf(stderr, "Restarting SPI\n");
-                    usleep(185*10000);
+                    usleep(5000);
                     open_spi_port(spi_path);
                 }
-                continue;
             }
 
+            size_t offset = 80*pak + 60*80*seg;
             fprintf(stderr, "offset: %d\n", offset);
 
             for (int i = 0; i < 80; i++) {

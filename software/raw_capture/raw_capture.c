@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
                 pak--;
                 resets++;
                 usleep(1000);
-                continue;
                 if (resets == 100) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
@@ -124,6 +123,7 @@ int main(int argc, char *argv[]) {
                     usleep(200000); // 200ms
                     open_spi_port(spi_path);
                 }
+                continue;
             }
 
 

@@ -71,8 +71,10 @@ void read_image(uint16_t *data_ptr) {
             }
 
             // skip segment number 0 (from datasheet)
-            if (segment_number == 0)
+            if (segment_number == 0) {
+                pack--;
                 continue;
+            }
 
             // set seg on packet number 20 (from datasheet)
             if (packet_number == 20 && segment_number >= 1)

@@ -54,13 +54,12 @@ void read_image(uint16_t *data_ptr) {
             uint8_t  segment_number;
             uint16_t packet_number;
 
-            fprintf(stderr, "%d.%d ", seg, pak);
 
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            fprintf(stderr, "%x %x\n", packet[0], packet[1]);
+            fprintf(stderr, "%x %x ", packet[0], packet[1]);
 
             // handle drop packets
             if ((packet[0] & 0x0f) == 0x0f) {
@@ -68,6 +67,8 @@ void read_image(uint16_t *data_ptr) {
                 pak--;
                 continue;
             } 
+
+            fprintf(stderr, "%d.%d ", seg, pak);
 
             // get segment and packet number
             segment_number = (packet[0] >> 4) & 0b00000111;

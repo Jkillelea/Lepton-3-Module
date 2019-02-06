@@ -72,7 +72,7 @@ void read_image(uint16_t *data_ptr) {
 
             // skip segment number 0 (from datasheet)
             if (segment_number == 0) {
-                pack--;
+                pak--;
                 continue;
             }
 

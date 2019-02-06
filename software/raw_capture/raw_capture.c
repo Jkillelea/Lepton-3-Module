@@ -121,9 +121,9 @@ int main(int argc, char *argv[]) {
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            // size_t offset = 80*packet_number + 4800*(segment_number-1);
+            size_t offset = 80*packet_number + 4800*(segment_number-1);
 
-            fprintf(stderr, "%d %d\n", offset, max_offset);
+            // fprintf(stderr, "%d %d\n", offset, max_offset);
 
             // if (offset > max_offset)
             //     continue;

@@ -87,15 +87,15 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             }
 
-            if (packet_number == 20) {
+            if (pak == 20) {
                 fprintf(stderr, "segment %d\n", seg);
                 if (0 < segment_number && segment_number < 5) {
                     seg = segment_number; 
                 }
             }
 
-            // can't use a straight memcpy since we have to account for endianness
-            // when copying over. Lepton SPI is big endian and the armv7l 
+            // Can't use a straight memcpy since we have to account for endianness
+            // when copying over. Lepton SPI is big endian and the pi's armv7l 
             // processor is little endian
             size_t offset = 80*pak + 60*80*(seg-1);
             for (int i = 0; i < 80; i++) {

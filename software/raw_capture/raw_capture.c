@@ -94,8 +94,6 @@ void read_image(uint16_t *data_ptr) {
             // uint16_t packet_number  = packet[1];
 
             if (packet_number != pak) {
-                fprintf(stderr, "mismatch: wanted %d got %d\n", pak, packet_number);
-
                 pak--;
                 resets++;
 

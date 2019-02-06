@@ -49,28 +49,11 @@ static int set_spi_number(const char *arg);
 
 void read_image(uint16_t *data_ptr) {
     uint8_t  segment_number = 0;
-    uint16_t packet_number = 0;
-    uint32_t seg, pak = 0;
-
-    // sync up to frame 1.20
-    for (int i = 0; i < 10000; i++) {
-        // Read SPI
-        if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
-            fprintf(stderr, "SPI failed to read enough bytes!\n");
-
-        // get segment and packet number
-        seg = (packet[0] >> 4) & 0b00000111;
-        pak = ((packet[0] & 0x0f) << 4) | packet[1];
-
-        if ((packet[0] & 0x0f) == 0x0f)
-            continue;
-
-         if (seg == 1 && pak == 20)
-             break;
-    }
+    int16_t packet_number = 0;
+    int32_t seg, pak = 0;
 
     for (seg = 1; seg <= NUM_SEGMENTS; seg++) {
-        for (pak = 21; pak < PACKETS_PER_SEGMENT; pak++) {
+        for (pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
@@ -82,17 +65,29 @@ void read_image(uint16_t *data_ptr) {
                 continue;
             } 
 
-            fprintf(stderr, "%d.%d ", seg, pak);
-
             // get segment and packet number
             segment_number = (packet[0] >> 4) & 0b00000111;
             packet_number  = ((packet[0] & 0x0f) << 4) 
                              | packet[1];
 
+            fprintf(stderr, "%d.%d ", seg, pak);
             fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
 
-            size_t offset = 80*pak + 60*80*(seg-1);
+            if (pak != packet_number) {
+                pak--;
+                continue;
+            }
 
+
+            if (packet_number = 20) {
+                if (0 < segment_number && segment_number < 5)
+                    seg = segment_number;
+            }
+
+            // can't use a straight memcpy since we have to account for endianness
+            // when copying over. Lepton SPI is big endian and the armv7l 
+            // processor is little endian
+            size_t offset = 80*pak + 60*80*(seg-1);
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;
                 data_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];

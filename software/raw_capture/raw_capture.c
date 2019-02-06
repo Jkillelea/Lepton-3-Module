@@ -27,7 +27,6 @@
 // Image
 static uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
 static uint16_t *image_ptr  = *image;
-static size_t    max_offset = sizeof(image) / sizeof(uint16_t);
 
 // I2C vars
 static uint16_t i2c_number;
@@ -48,7 +47,6 @@ static int resets = 0;
 static void pabort(const char *s);
 static int open_spi_port(const char *path);
 static int set_spi_number(const char *arg);
-// static void lepton_reboot_and_configure();
 
 int main(int argc, char *argv[]) {
     // parse opts
@@ -79,7 +77,6 @@ int main(int argc, char *argv[]) {
     if (LEP_SetRadEnableState(&i2c_port, LEP_RAD_ENABLE) != LEP_OK)
         pabort("Couldn't enable radiometry!");
 
-
     // SPI bus number
     if(set_spi_number(argv[2]) < 0)
         return -1;
@@ -88,20 +85,34 @@ int main(int argc, char *argv[]) {
 
     for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
+            uint8_t  segment_number;
+            uint16_t packet_number;
 
+            fprintf(stderr, "%d%d ", seg, pak);
+
+            // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // Handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
-                fprintf(stderr, "drop %x\n", packet[0]);
+            if ((packet[0] & 0x0f) == 0x0f) { // Handle drop packets
+                fprintf(stderr, "drop (%x)", packet[0]);
                 pak--;
                 continue;
+            } else {
+                segment_number = (packet[0] >> 4) & 0b00000111;
+                packet_number  = (packet[0] << 4) | packet[1];
+                fprintf(stderr, "got %d.%d\n", segment_number, packet_number);
             }
 
-            uint8_t segment_number = seg;
+            // Warn on bounds error
+            if (segment_number < 0 || segment_number > NUM_SEGMENTS)
+                fprintf(stderr, "\tsegment number out of bounds");
+            if (segment_number > PACKETS_PER_SEGMENT)
+                fprintf(stderr, "\tpacket number out of bounds");
+
             // uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
-            uint16_t packet_number = (packet[0] << 4) | packet[1];
+            // uint16_t packet_number = (packet[0] << 4) | packet[1];
+            // uint8_t segment_number = seg;
             // uint16_t packet_number  = packet[1];
 
             // if (packet_number != pak) {
@@ -124,14 +135,8 @@ int main(int argc, char *argv[]) {
             //     continue;
             // }
 
-            fprintf(stderr, "%d %d\n", segment_number, packet_number);
 
-            size_t offset = 80*packet_number + 60*80*(segment_number-1);
-
-            // fprintf(stderr, "%d %d\n", offset, max_offset);
-
-            // if (offset > max_offset)
-            //     continue;
+            size_t offset = 80*pak + 60*80*(seg-1);
 
             for (int i = 0; i < 80; i++) {
                 size_t idx = 2*i + 4;

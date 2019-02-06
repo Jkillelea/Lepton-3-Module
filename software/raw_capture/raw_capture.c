@@ -73,8 +73,8 @@ void read_image(uint16_t *data_ptr) {
 
     // for (uint32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
     //     for (uint32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
-    for (; seg <= NUM_SEGMENTS; seg++) {
-        for (; pak < PACKETS_PER_SEGMENT; pak++) {
+    for (seg; seg <= NUM_SEGMENTS; seg++) {
+        for (pak; pak < PACKETS_PER_SEGMENT; pak++) {
             // Read SPI
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");

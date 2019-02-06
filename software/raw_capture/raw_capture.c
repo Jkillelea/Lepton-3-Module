@@ -99,8 +99,8 @@ int main(int argc, char *argv[]) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // uint16_t packet_number = ((packet[0] &0x0f) << 4) | packet[1];
-            uint16_t packet_number = packet[1];
+            uint16_t packet_number = ((packet[0] &0x0f) << 4) | packet[1];
+            // uint16_t packet_number = packet[1];
             uint8_t segment_number = (packet[0] >> 4) & 0b00000111;
 
             fprintf(stderr, "%d %d\n", segment_number, packet_number);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
                     resets = 0;
                     fprintf(stderr, "Restarting SPI\n");
                     close(spi_fd);
-                    usleep(5000);
+                    usleep(50000);
                     open_spi_port(spi_path);
                 }
                 continue;

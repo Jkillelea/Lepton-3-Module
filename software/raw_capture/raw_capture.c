@@ -51,16 +51,14 @@ void read_image(uint16_t *data_ptr) {
     static uint32_t mismatches = 0; // number of times gotten out of sync
     uint8_t segment_number     = 0; // segment number from SPI packet
     int16_t packet_number      = 0; // packet number from SPI packet
-    int32_t seg, pak           = 0; // loop vars
 
-    for (seg = 1; seg <= NUM_SEGMENTS; seg++) {
-        for (pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
-            // Read SPI
-            if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE)
+    for (int32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
+        for (int32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
+
+            if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 fprintf(stderr, "SPI failed to read enough bytes!\n");
 
-            // handle drop packets
-            if ((packet[0] & 0x0f) == 0x0f) {
+            if ((packet[0] & 0x0f) == 0x0f) { // handle drop packets
                 fprintf(stderr, "drop (%x)\n", packet[0]);
                 pak--;
                 continue;
@@ -68,7 +66,7 @@ void read_image(uint16_t *data_ptr) {
 
             // get segment and packet number
             segment_number = (packet[0] >> 4) & 0b00000111;
-            packet_number = packet[1];
+            packet_number  = packet[1];
 
             fprintf(stderr, "%d got %d\n", pak, packet_number);
 

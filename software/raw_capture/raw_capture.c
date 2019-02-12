@@ -85,10 +85,11 @@ void read_image(uint16_t *data_ptr) {
             }
 
             if (pak == 20) { // segment number is only valid on packet 20
+                fprintf(stderr, "seg %d ", seg);
+                fprintf(stderr, "segment %d\n", seg);
                 if (0 < segment_number && segment_number < 5) {
                     seg = segment_number; 
                 }
-                fprintf(stderr, "segment %d\n", seg);
             }
 
             // Copy the image data from the SPI packet
@@ -145,7 +146,9 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // Read the image
-    // for (int i = 0; i < 5; i++)
+    // for (int i = 0; i < 5; i++) {
+    //     read_image(image_ptr);
+    // }
     read_image(image_ptr);
 
     // Print to stdout

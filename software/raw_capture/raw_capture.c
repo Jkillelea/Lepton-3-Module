@@ -73,6 +73,7 @@ void read_image(uint16_t *data_ptr) {
             fprintf(stderr, "%d got %d\n", pak, packet_number);
 
             if (pak != packet_number) { // out of sync
+                fprintf(stderr, "mismatch %d\n", mismatches);
                 pak = -1;
                 mismatches++;
                 if (mismatches == 100) {

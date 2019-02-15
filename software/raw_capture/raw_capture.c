@@ -16,36 +16,27 @@
 #include <LEPTON_Types.h>
 #include <LEPTON_ErrorCodes.h>
 
-#define IMAGE_WIDTH (160)
-#define IMAGE_HEIGHT (120)
-#define NUM_SEGMENTS (4)
-#define PACKETS_PER_SEGMENT (60)
-#define PACKETS_PER_FRAME (PACKETS_PER_SEGMENT*NUM_SEGMENTS)
-#define PACKET_SIZE (164)
-#define PACKET_SIZE_UINT16 (164/2)
+#include "util.h"
+#include "global_vars.h"
 
 // Image
-static uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
-static uint16_t *image_ptr  = *image;
+uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
+uint16_t *image_ptr  = *image;
 
 // I2C vars
-static uint16_t i2c_number = -1;
-static LEP_CAMERA_PORT_DESC_T i2c_port;
+uint16_t i2c_number = -1;
+LEP_CAMERA_PORT_DESC_T i2c_port;
 
 // SPI protocol vars
-static int     spi_fd    = -1;
-static int     spi_speed = 20000000;
-static uint8_t spi_mode  = SPI_MODE_3;
-static char    spi_path[255];
-static uint8_t spi_bits_per_word = 8;
+int     spi_fd    = -1;
+int     spi_speed = 20000000;
+uint8_t spi_mode  = SPI_MODE_3;
+char    spi_path[255];
+uint8_t spi_bits_per_word = 8;
 
 // SPI communication vars
-static uint8_t packet[PACKET_SIZE] = {0x0};
+uint8_t packet[PACKET_SIZE] = {0x0};
 
-// Functions
-static void pabort(const char *s);
-static int open_spi_port(const char *path);
-static int set_spi_number(const char *arg);
 
 void read_image(uint16_t *data_ptr) {
     static uint32_t mismatches = 0; // number of times gotten out of sync
@@ -162,59 +153,3 @@ int main(int argc, char *argv[]) {
 }
 
 
-// read argv for spi number (should be 0 or 1)
-static int set_spi_number(const char *arg) {
-    int spi_number = atoi(arg);
-    switch (spi_number) { // SPI bus number
-        case 0:
-            strcpy(spi_path, "/dev/spidev0.0");
-            break;
-        case 1:
-            strcpy(spi_path, "/dev/spidev0.1");
-            break;
-        default:
-            fprintf(stderr, "Invalid SPI number %d. Options are 0 or 1.\n", 
-                            spi_number);
-            return -1;
-    }
-    return 0;
-}
-
-// Open SPI port and do all the ioctl setup
-static int open_spi_port(const char *path) {
-    int ret;
-	int spi_fd = open(path, O_RDWR);
-	if (spi_fd < 0)
-		pabort("can't open device");
-
-	ret = ioctl(spi_fd, SPI_IOC_WR_MODE, &spi_mode);
-	if (ret == -1)
-		pabort("can't set spi mode");
-
-	ret = ioctl(spi_fd, SPI_IOC_RD_MODE, &spi_mode);
-	if (ret == -1)
-		pabort("can't get spi mode");
-
-	ret = ioctl(spi_fd, SPI_IOC_WR_BITS_PER_WORD, &spi_bits_per_word);
-	if (ret == -1)
-		pabort("can't set bits per word");
-
-	ret = ioctl(spi_fd, SPI_IOC_RD_BITS_PER_WORD, &spi_bits_per_word);
-	if (ret == -1)
-		pabort("can't get bits per word");
-
-	ret = ioctl(spi_fd, SPI_IOC_WR_MAX_SPEED_HZ, &spi_speed);
-	if (ret == -1)
-		pabort("can't set max speed hz");
-
-	ret = ioctl(spi_fd, SPI_IOC_RD_MAX_SPEED_HZ, &spi_speed);
-	if (ret == -1)
-		pabort("can't get max speed hz");
-    return spi_fd;
-}
-
-// Exit program with error message
-static void pabort(const char *s) {
-	perror(s);
-	abort();
-}

@@ -6,7 +6,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-static const char *device = "/dev/spidev0.0";
+// static char       device[] = "/dev/spidev0.0";
+static const char *device0 = "/dev/spidev0.0";
+static const char *device1 = "/dev/spidev0.1";
+
 uint8_t mode = SPI_MODE_3;
 static uint8_t bits = 8;
 static uint32_t speed = 20000000;
@@ -19,8 +22,11 @@ static void pabort(const char *s) {
 	abort();
 }
 
-LeptonThread::LeptonThread() : QThread() {
-    SpiOpenPort(0);
+LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
+    // SpiOpenPort(spi_num);
+
+    this->i2c_num = i2c_num;
+    this->spi_num = spi_num;
     this->enableRadiometry();
 }
 
@@ -40,7 +46,12 @@ void LeptonThread::run() {
 		}
 	}
 
-	fd = open(device, O_RDWR);
+    if (this->spi_num == 1) {
+        fd = open(device1, O_RDWR); // /dev/spidev0.1
+    } else {
+        fd = open(device0, O_RDWR); // /dev/spidev0.0
+    }
+
 	if (fd < 0)
 		pabort("can't open device");
 

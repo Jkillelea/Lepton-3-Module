@@ -30,7 +30,7 @@ class LeptonThread : public QThread
   Q_OBJECT;
 
 public:
-  LeptonThread();
+  LeptonThread(int i2c_num = 1, int spi_num = 0);
   ~LeptonThread();
 
   void run();
@@ -51,6 +51,8 @@ private:
 
   uint8_t result[PACKET_SIZE*PACKETS_PER_FRAME];
   uint16_t *frameBuffer;
+
+  int i2c_num, spi_num;
 
 };
 

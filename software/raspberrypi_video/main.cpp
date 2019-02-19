@@ -51,7 +51,18 @@ int main( int argc, char **argv )
 
 	//create a thread to gather SPI data
 	//when the thread emits updateImage, the label should update its image accordingly
-	LeptonThread *thread = new LeptonThread();
+    int i2c_num = 1;
+    int spi_num = 0;
+    if (argc == 3) {
+        i2c_num = atoi(argv[1]);
+        spi_num = atoi(argv[2]);
+    } else {
+        qDebug() << "Usage: " << argv[0] << " [i2c_num] [spi_num]";
+    }
+
+    qDebug() << "Using i2c_num = " << i2c_num << ", spi_num = " << spi_num;
+
+	LeptonThread *thread = new LeptonThread(i2c_num, spi_num);
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
 	
 	//connect ffc button to the thread's ffc action

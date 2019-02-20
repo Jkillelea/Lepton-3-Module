@@ -34,6 +34,7 @@ public:
   ~LeptonThread();
 
   void run();
+  void connect();
   void enableRadiometry();
 
 public slots:

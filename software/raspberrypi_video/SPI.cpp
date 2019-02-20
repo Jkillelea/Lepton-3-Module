@@ -12,18 +12,14 @@ int SpiOpenPort (int spi_device)
 	int status_value = -1;
 	int *spi_cs_fd;
 
-
-	//----- SET SPI MODE -----
 	//SPI_MODE_0 (0,0)  CPOL=0 (Clock Idle low level), CPHA=0 (SDO transmit/change edge active to idle)
 	//SPI_MODE_1 (0,1)  CPOL=0 (Clock Idle low level), CPHA=1 (SDO transmit/change edge idle to active)
 	//SPI_MODE_2 (1,0)  CPOL=1 (Clock Idle high level), CPHA=0 (SDO transmit/change edge active to idle)
 	//SPI_MODE_3 (1,1)  CPOL=1 (Clock Idle high level), CPHA=1 (SDO transmit/change edge idle to active)
 	spi_mode = SPI_MODE_3;
 
-	//----- SET BITS PER WORD -----
 	spi_bitsPerWord = 8;
 
-	//----- SET SPI BUS SPEED -----
 	spi_speed = 20000000;				//1000000 = 1MHz (1uS per bit)
 
 
@@ -32,11 +28,10 @@ int SpiOpenPort (int spi_device)
 	else
 		spi_cs_fd = &spi_cs0_fd;
 
-
 	if (spi_device)
-		*spi_cs_fd = open(std::string("/dev/spidev0.0").c_str(), O_RDWR);
+		*spi_cs_fd = open("/dev/spidev0.1", O_RDWR);
 	else
-		*spi_cs_fd = open(std::string("/dev/spidev0.0").c_str(), O_RDWR);
+		*spi_cs_fd = open("/dev/spidev0.0", O_RDWR);
 
 	if (*spi_cs_fd < 0) {
 		perror("Error - Could not open SPI device");

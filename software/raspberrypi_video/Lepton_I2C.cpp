@@ -15,15 +15,17 @@ LEP_CAMERA_PORT_DESC_T _port;
 LEP_SYS_FPA_TEMPERATURE_KELVIN_T fpa_temp_kelvin;
 LEP_RESULT result;
 
-int lepton_connect() {
-	int res = (int)LEP_OpenPort(1, LEP_CCI_TWI, 400, &_port);
+int default_i2c_num = 1;
+
+int lepton_connect(int i2c_num) {
+	int res = (int) LEP_OpenPort(i2c_num, LEP_CCI_TWI, 400, &_port);
 	_connected = true;
 	return res;
 }
 
 int lepton_enable_radiometry() {
     if (!_connected)
-        lepton_connect();
+        lepton_connect(default_i2c_num);
 
     int res = (int) LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
     return res;
@@ -32,7 +34,7 @@ int lepton_enable_radiometry() {
 
 int lepton_temperature(){
 	if(!_connected)
-		lepton_connect();
+		lepton_connect(default_i2c_num);
 	result = ((LEP_GetSysFpaTemperatureKelvin(&_port, &fpa_temp_kelvin)));
 	printf("FPA temp kelvin: %i, code %i\n", fpa_temp_kelvin, result);
 	return (fpa_temp_kelvin/100);
@@ -48,7 +50,7 @@ float raw2Celsius(float raw){
 void lepton_perform_ffc() {
 	printf("performing FFC...\n");
 	if(!_connected) {
-		int res = lepton_connect();
+		int res = lepton_connect(default_i2c_num);
 		if (res != 0) {
 			//check SDA and SCL lines if you get this error
 			printf("I2C could not connect\n");
@@ -67,7 +69,7 @@ void lepton_perform_ffc() {
 
 void lepton_restart() {
 	if(!_connected) {
-		int res = lepton_connect();
+		int res = lepton_connect(default_i2c_num);
 		if (res != 0) {
 			//check SDA and SCL lines if you get this error
 			printf("I2C could not connect\n");

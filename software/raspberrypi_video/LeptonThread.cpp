@@ -23,11 +23,13 @@ static void pabort(const char *s) {
 }
 
 LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
-    // SpiOpenPort(spi_num);
 
     this->i2c_num = i2c_num;
     this->spi_num = spi_num;
+
+    this->connect();
     this->enableRadiometry();
+    SpiOpenPort(this->spi_num);
 }
 
 LeptonThread::~LeptonThread() {
@@ -47,8 +49,10 @@ void LeptonThread::run() {
 	}
 
     if (this->spi_num == 1) {
+        qDebug() << "Using " << device1;
         fd = open(device1, O_RDWR); // /dev/spidev0.1
     } else {
+        qDebug() << "Using " << device0;
         fd = open(device0, O_RDWR); // /dev/spidev0.0
     }
 
@@ -103,10 +107,10 @@ void LeptonThread::run() {
                     resets += 1;
                     usleep(1000);
                     if (resets == 100) {
-                        SpiClosePort(0);
+                        SpiClosePort(this->spi_num);
                         qDebug() << "restarting spi...";
                         usleep(5000);
-                        SpiOpenPort(0);
+                        SpiOpenPort(this->spi_num);
                     }
                     continue;
                 } else {
@@ -191,7 +195,7 @@ void LeptonThread::run() {
 	}
 	
 	//finally, close SPI port just bcuz
-	SpiClosePort(0);
+	SpiClosePort(this->spi_num);
 }
 
 void LeptonThread::snapshot(){
@@ -249,6 +253,10 @@ void LeptonThread::snapshot(){
 	fclose(arq);
 }
 
+
+void LeptonThread::connect() {
+	lepton_connect(this->i2c_num);
+}
 
 // perform FFC
 void LeptonThread::performFFC() {

@@ -19,7 +19,12 @@ int default_i2c_num = 1;
 
 int lepton_connect(int i2c_num) {
 	int res = (int) LEP_OpenPort(i2c_num, LEP_CCI_TWI, 400, &_port);
-	_connected = true;
+    if (res != LEP_OK) {
+        printf("Failed to connect!\n");
+        printf("error code: %d\n", res);
+    } else {
+        _connected = true;
+    }
 	return res;
 }
 
@@ -27,16 +32,19 @@ int lepton_enable_radiometry() {
     if (!_connected)
         lepton_connect(default_i2c_num);
 
-    int res = (int) LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
+    int res = LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
+    if (res != LEP_OK) {
+        printf("Failed to enable radiometry\n");
+        printf("error code: %d\n", res);
+    }
     return res;
-
 }
 
 int lepton_temperature(){
 	if(!_connected)
 		lepton_connect(default_i2c_num);
 	result = ((LEP_GetSysFpaTemperatureKelvin(&_port, &fpa_temp_kelvin)));
-	printf("FPA temp kelvin: %i, code %i\n", fpa_temp_kelvin, result);
+	// printf("FPA temp kelvin: %i, code %i\n", fpa_temp_kelvin, result);
 	return (fpa_temp_kelvin/100);
 }
 

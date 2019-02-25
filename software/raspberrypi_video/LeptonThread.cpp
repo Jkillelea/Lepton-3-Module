@@ -24,7 +24,6 @@ LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
     this->spi_num = spi_num;
     this->enableRadiometry();
     this->openSPI(spi_num);
-    // SpiOpenPort(spi_num);
 }
 
 LeptonThread::~LeptonThread() {
@@ -32,9 +31,8 @@ LeptonThread::~LeptonThread() {
 
 void LeptonThread::run() {
     qDebug() << "run()";
+
 	// create the initial image
-	// int ret = 0;
-	// int fd;
 	QRgb red = qRgb(255, 0, 0);
 	myImage = QImage(WIDTH, HEIGHT, QImage::Format_RGB888);
 
@@ -44,8 +42,6 @@ void LeptonThread::run() {
 		}
 	}
 
-
-	//open spi port
 	emit updateImage(myImage);
 
     qDebug() << "image loop";
@@ -57,9 +53,8 @@ void LeptonThread::run() {
             for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
 
                 // read data packets from lepton over SPI
-                read(fd, 
-                    result+sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j), 
-                    sizeof(uint8_t)*PACKET_SIZE);
+                size_t offset = sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j);
+                read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
 
                 int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
 
@@ -71,10 +66,8 @@ void LeptonThread::run() {
                     usleep(1000);
                     if (resets == 100) {
                         // qDebug() << "restarting spi...";
-                        // SpiClosePort(this->spi_num);
                         this->closeSPI();
                         usleep(5000);
-                        // SpiOpenPort(this->spi_num);
                         this->openSPI(this->spi_num);
                     }
                     continue;
@@ -99,20 +92,18 @@ void LeptonThread::run() {
 		frameBuffer = (uint16_t *) result;
 		int row, column;
 		uint16_t value;
-		// uint16_t minValue = 65535;
-		// uint16_t maxValue = 0;
 		uint16_t minValue = 0xFFFF;
 		uint16_t maxValue = 0x0000;
 		
 		for (int i = 0; i < FRAME_SIZE_UINT16; i++) {
-			//skip the first 2 uint16_t's of every packet, they're 4 header bytes
+			// Skip the first 2 uint16_t's of every packet, they're 4 header bytes
 			if (i % PACKET_SIZE_UINT16 < 2) {
 				continue;
 			}
 			
 			// flip the MSB and LSB at the last second
 			int temp = result[i*2];
-			result[i*2] = result[i*2+1];
+			result[i*2]   = result[i*2+1];
 			result[i*2+1] = temp;
 			
 			value = frameBuffer[i];
@@ -154,13 +145,12 @@ void LeptonThread::run() {
 				
 		}
 
-		// emit the signal for update
+		// Emit the signal for update
 		emit updateImage(myImage);
 		frame++;
 	}
 	
-	//finally, close SPI port just bcuz
-	// SpiClosePort(this->spi_num);
+	// Finally, close SPI port
     this->closeSPI();
 }
 
@@ -230,29 +220,17 @@ int LeptonThread::openSPI(int num) {
 	if (fd < 0)
 		pabort("can't open device");
 
-	int ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
-	if (ret == -1)
+	if (ioctl(fd, SPI_IOC_WR_MODE, &mode) == -1)
 		pabort("can't set spi mode");
 
-	// ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
-	// if (ret == -1)
-	// 	pabort("can't get spi mode");
 
-	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-	if (ret == -1)
+	if (ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits) == -1)
 		pabort("can't set bits per word");
 
-	// ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
-	// if (ret == -1)
-	// 	pabort("can't get bits per word");
 
-	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-	if (ret == -1)
+	if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) == -1)
 		pabort("can't set max speed hz");
 
-	// ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
-	// if (ret == -1)
-	// 	pabort("can't get max speed hz");
     return fd;
 }
 

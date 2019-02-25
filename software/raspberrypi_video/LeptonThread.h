@@ -34,8 +34,9 @@ public:
   ~LeptonThread();
 
   void run();
-  void connect();
   void enableRadiometry();
+  int openSPI(int num);
+  int closeSPI();
 
 public slots:
   void performFFC();
@@ -54,6 +55,7 @@ private:
   uint16_t *frameBuffer;
 
   int i2c_num, spi_num;
+  int fd;
 
 };
 

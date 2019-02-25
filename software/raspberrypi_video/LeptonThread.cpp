@@ -6,10 +6,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// static char       device[] = "/dev/spidev0.0";
-static const char *device0 = "/dev/spidev0.0";
-static const char *device1 = "/dev/spidev0.1";
-
 uint8_t mode = SPI_MODE_3;
 static uint8_t bits = 8;
 static uint32_t speed = 20000000;
@@ -23,22 +19,22 @@ static void pabort(const char *s) {
 }
 
 LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
-
+    qDebug() << "LeptonThread()";
     this->i2c_num = i2c_num;
     this->spi_num = spi_num;
-
-    this->connect();
     this->enableRadiometry();
-    SpiOpenPort(this->spi_num);
+    this->openSPI(spi_num);
+    // SpiOpenPort(spi_num);
 }
 
 LeptonThread::~LeptonThread() {
 }
 
 void LeptonThread::run() {
+    qDebug() << "run()";
 	// create the initial image
-	int ret = 0;
-	int fd;
+	// int ret = 0;
+	// int fd;
 	QRgb red = qRgb(255, 0, 0);
 	myImage = QImage(WIDTH, HEIGHT, QImage::Format_RGB888);
 
@@ -48,44 +44,11 @@ void LeptonThread::run() {
 		}
 	}
 
-    if (this->spi_num == 1) {
-        qDebug() << "Using " << device1;
-        fd = open(device1, O_RDWR); // /dev/spidev0.1
-    } else {
-        qDebug() << "Using " << device0;
-        fd = open(device0, O_RDWR); // /dev/spidev0.0
-    }
-
-	if (fd < 0)
-		pabort("can't open device");
-
-	ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
-	if (ret == -1)
-		pabort("can't set spi mode");
-
-	ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
-	if (ret == -1)
-		pabort("can't get spi mode");
-
-	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-	if (ret == -1)
-		pabort("can't set bits per word");
-
-	ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
-	if (ret == -1)
-		pabort("can't get bits per word");
-
-	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-	if (ret == -1)
-		pabort("can't set max speed hz");
-
-	ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
-	if (ret == -1)
-		pabort("can't get max speed hz");
 
 	//open spi port
 	emit updateImage(myImage);
 
+    qDebug() << "image loop";
     while (true) {
         int resets = 0;
         int segmentNumber = 0;
@@ -94,7 +57,7 @@ void LeptonThread::run() {
             for(int j = 0; j < PACKETS_PER_SEGMENT; j++) {
 
                 // read data packets from lepton over SPI
-                read(spi_cs0_fd, 
+                read(fd, 
                     result+sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j), 
                     sizeof(uint8_t)*PACKET_SIZE);
 
@@ -107,10 +70,12 @@ void LeptonThread::run() {
                     resets += 1;
                     usleep(1000);
                     if (resets == 100) {
-                        SpiClosePort(this->spi_num);
-                        qDebug() << "restarting spi...";
+                        // qDebug() << "restarting spi...";
+                        // SpiClosePort(this->spi_num);
+                        this->closeSPI();
                         usleep(5000);
-                        SpiOpenPort(this->spi_num);
+                        // SpiOpenPort(this->spi_num);
+                        this->openSPI(this->spi_num);
                     }
                     continue;
                 } else {
@@ -195,7 +160,8 @@ void LeptonThread::run() {
 	}
 	
 	//finally, close SPI port just bcuz
-	SpiClosePort(this->spi_num);
+	// SpiClosePort(this->spi_num);
+    this->closeSPI();
 }
 
 void LeptonThread::snapshot(){
@@ -253,10 +219,47 @@ void LeptonThread::snapshot(){
 	fclose(arq);
 }
 
+int LeptonThread::openSPI(int num) {
+    qDebug() << "open spi";
+    if (num == 1) {
+        fd = open("/dev/spidev0.1", O_RDWR); // /dev/spidev0.1
+    } else {
+        fd = open("/dev/spidev0.0", O_RDWR); // /dev/spidev0.0
+    }
 
-void LeptonThread::connect() {
-	lepton_connect(this->i2c_num);
+	if (fd < 0)
+		pabort("can't open device");
+
+	int ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
+	if (ret == -1)
+		pabort("can't set spi mode");
+
+	// ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+	// if (ret == -1)
+	// 	pabort("can't get spi mode");
+
+	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+	if (ret == -1)
+		pabort("can't set bits per word");
+
+	// ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+	// if (ret == -1)
+	// 	pabort("can't get bits per word");
+
+	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+	if (ret == -1)
+		pabort("can't set max speed hz");
+
+	// ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+	// if (ret == -1)
+	// 	pabort("can't get max speed hz");
+    return fd;
 }
+
+int LeptonThread::closeSPI() {
+    return close(fd);
+}
+
 
 // perform FFC
 void LeptonThread::performFFC() {

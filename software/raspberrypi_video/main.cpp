@@ -63,6 +63,7 @@ int main( int argc, char **argv )
     qDebug() << "Using i2c_num = " << i2c_num << ", spi_num = " << spi_num;
 
 	LeptonThread *thread = new LeptonThread(i2c_num, spi_num);
+
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
 	
 	//connect ffc button to the thread's ffc action
@@ -72,10 +73,13 @@ int main( int argc, char **argv )
 	//connect restart button to the thread's restart action
 	QObject::connect(button3, SIGNAL(clicked()), thread, SLOT(restart()));
 
+    qDebug() << "thread->start";
 	thread->start();
 	
+    qDebug() << "widget->show";
 	myWidget->show();
 
+    qDebug() << "a.exec()";
 	return a.exec();
 }
 

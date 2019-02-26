@@ -37,8 +37,8 @@ LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
 }
 
 LeptonThread::~LeptonThread() {
-    if (this->closeSPI() < 0)
-        qDebug() << "spi fd already closed";
+    if (this->fd > 0)
+        this->closeSPI();
 }
 
 void LeptonThread::run() {
@@ -248,7 +248,9 @@ int LeptonThread::openSPI(int num) {
 }
 
 int LeptonThread::closeSPI() {
-    return close(fd);
+    int result = close(fd);
+    fd = -1;
+    return result;
 }
 
 

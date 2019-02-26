@@ -1,10 +1,20 @@
 #include "LeptonThread.h"
 #include "Lepton_I2C.h"
 #include "Palettes.h"
-#include "SPI.h"
+
+#include <unistd.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <fcntl.h>
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
+
 
 uint8_t mode = SPI_MODE_3;
 static uint8_t bits = 8;
@@ -54,7 +64,8 @@ void LeptonThread::run() {
 
                 // read data packets from lepton over SPI
                 size_t offset = sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j);
-                read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
+                size_t nbytes = read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
+                assert(nbytes == sizeof(uint8_t)*PACKET_SIZE);
 
                 int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
 

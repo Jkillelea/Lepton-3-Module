@@ -28,6 +28,10 @@ static void pabort(const char *s) {
 	abort();
 }
 
+static void pwarn(const char *s) {
+	perror(s);
+}
+
 LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
     qDebug() << "LeptonThread()";
     this->i2c_num = i2c_num;
@@ -67,7 +71,12 @@ void LeptonThread::run() {
                 // read data packets from lepton over SPI
                 size_t offset = sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j);
                 size_t nbytes = read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
-                assert(nbytes == sizeof(uint8_t)*PACKET_SIZE);
+                // assert(nbytes == sizeof(uint8_t)*PACKET_SIZE);
+                if (nbytes == sizeof(uint8_t)*PACKET_SIZE) {
+                    qDebug() << "Didn't read enough data: " << nbytes 
+                             << "/" 
+                             << sizeof(uint8_t)*PACKET_SIZE;
+                }
 
                 int packetNumber = result[((i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE)+1];
 
@@ -230,19 +239,21 @@ int LeptonThread::openSPI(int num) {
         fd = open("/dev/spidev0.0", O_RDWR); // /dev/spidev0.0
     }
 
-	if (fd < 0)
-		pabort("can't open device");
+	if (fd < 0) {
+		pwarn("can't open device");
+    }
 
-	if (ioctl(fd, SPI_IOC_WR_MODE, &mode) == -1)
-		pabort("can't set spi mode");
+	if (ioctl(fd, SPI_IOC_WR_MODE, &mode) == -1) {
+		pwarn("can't set spi mode");
+    }
 
+	if (ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits) == -1) {
+		pwarn("can't set bits per word");
+    }
 
-	if (ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits) == -1)
-		pabort("can't set bits per word");
-
-
-	if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) == -1)
-		pabort("can't set max speed hz");
+	if (ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) == -1) {
+		pwarn("can't set max speed hz");
+    }
 
     return fd;
 }

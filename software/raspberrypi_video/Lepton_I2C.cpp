@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <stdio.h>
 #include <stdbool.h>
 #include "Lepton_I2C.h"
@@ -20,8 +21,10 @@ int default_i2c_num = 1;
 int lepton_connect(int i2c_num) {
 	int res = (int) LEP_OpenPort(i2c_num, LEP_CCI_TWI, 400, &_port);
     if (res != LEP_OK) {
-        printf("Failed to connect!\n");
-        printf("error code: %d\n", res);
+        // printf("Failed to connect!\n");
+        // printf("error code: %d\n", res);
+        qDebug() << "Failed to connect!";
+        qDebug() << "error code: " << res;
     } else {
         _connected = true;
     }
@@ -34,8 +37,10 @@ int lepton_enable_radiometry() {
 
     int res = LEP_SetRadEnableState(&_port, LEP_RAD_ENABLE);
     if (res != LEP_OK) {
-        printf("Failed to enable radiometry\n");
-        printf("error code: %d\n", res);
+        // printf("Failed to enable radiometry\n");
+        // printf("error code: %d\n", res);
+        qDebug() << "Failed to enable radiometry";
+        qDebug() << "error code: " << res;
     }
     return res;
 }
@@ -56,22 +61,22 @@ float raw2Celsius(float raw){
 }
 
 void lepton_perform_ffc() {
-	printf("performing FFC...\n");
+	qDebug() << "performing FFC...";
 	if(!_connected) {
 		int res = lepton_connect(default_i2c_num);
 		if (res != 0) {
 			//check SDA and SCL lines if you get this error
-			printf("I2C could not connect\n");
-			printf("error code: %d\n", res);
+			qDebug() << "I2C could not connect";
+			qDebug() << "error code: " << res;
 		}
 	}
 
     int res = (int)LEP_RunSysFFCNormalization(&_port);
     if (res != 0) {
-        printf("FFC not successful\n");
-        printf("error code: %d\n", res);
+        qDebug() << "FFC not successful";
+        qDebug() << "error code: " << res;
     } else {
-        printf("FFC successful\n");
+        qDebug() << "FFC successful";
     }
 }
 
@@ -80,16 +85,16 @@ void lepton_restart() {
 		int res = lepton_connect(default_i2c_num);
 		if (res != 0) {
 			//check SDA and SCL lines if you get this error
-			printf("I2C could not connect\n");
-			printf("error code: %d\n", res);
+			qDebug() << "I2C could not connect";
+			qDebug() << "error code: " << res;
 		}
 	}
 
-	printf("restarting...\n");
+	qDebug() << "restarting...";
 	Result res = LEP_RunOemReboot(&_port);
 
 	if(res != LEP_OK)
-		printf("restart unsuccessful with error: %d\n", res);
+		qDebug() << "restart unsuccessful with error: " << res;
 	else
-		printf("restart successful!\n");
+		qDebug() << "restart successful!";
 }

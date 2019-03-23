@@ -18,16 +18,17 @@ LEP_RESULT result;
 
 int default_i2c_num = 1;
 
+// BIG FAT !!TODO!! -> This file only works for one camera right now, need to 
+// refactor for two cameras or make into a Cpp class
 int lepton_connect(int i2c_num) {
 	LEP_RESULT res = LEP_OpenPort(i2c_num, LEP_CCI_TWI, 400, &_port);
-    if (res != LEP_OK) {
-        qDebug() << "Failed to connect!";
-        // qDebug() << "error code: " << res << "";
-        qDebug() << "error code: " << error_as_string(res);
-    } else {
+
+    if (res != LEP_OK)
+        qDebug() << "Failed to connect!\nerror code: " << error_as_string(res);
+    else
         _connected = true;
-    }
-	return res;
+
+    return res;
 }
 
 int lepton_enable_radiometry() {

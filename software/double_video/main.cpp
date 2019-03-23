@@ -12,10 +12,10 @@
 #include "LeptonThread.h"
 #include "MyLabel.h"
 
-const int WINDOW_WIDTH = 340;
+const int IMAGE_HEIGHT  = 240;
+const int IMAGE_WIDTH   = 320;
 const int WINDOW_HEIGHT = 290;
-const int IMAGE_WIDTH = 320;
-const int IMAGE_HEIGHT = 240;
+const int WINDOW_WIDTH  = 340;
 
 int main( int argc, char **argv ) {
     //create the app

@@ -38,15 +38,16 @@ int main( int argc, char **argv ) {
     label2.setGeometry(IMAGE_WIDTH + 30, 10, IMAGE_WIDTH, IMAGE_HEIGHT);
     label2.setPixmap(QPixmap::fromImage(image));
 
-    //create a FFC button
+    qDebug() << "Button setup";
+    // create a FFC button
     QPushButton *ffcButton1 = new QPushButton("FFC", myWidget);
     ffcButton1->setGeometry(IMAGE_WIDTH/3-100, WINDOW_HEIGHT-35, 100, 30);
 
-    //create a Snapshot button
+    // create a Snapshot button
     QPushButton *captureButton1 = new QPushButton("Capture", myWidget);
     captureButton1->setGeometry(IMAGE_WIDTH/3+10, WINDOW_HEIGHT-35, 100, 30);
 
-    //create a reset button
+    // create a reset button
     QPushButton *restartButton1 = new QPushButton("Restart", myWidget);
     restartButton1->setGeometry(IMAGE_WIDTH/3+120, WINDOW_HEIGHT-35, 100, 30);
 
@@ -64,26 +65,29 @@ int main( int argc, char **argv ) {
                                 WINDOW_HEIGHT-35, 100, 30);
 
 
+    qDebug() << "lepton1 setup";
+
     LeptonThread *lepton1 = new LeptonThread(1, 0); // /dev/i2c-1, /dev/spidev0.0
     QObject::connect(lepton1, SIGNAL(updateImage(QImage)), &label, SLOT(setImage(QImage)));
-
-    //connect ffc button to the lepton1's ffc action
+    // connect ffc button to the lepton1's ffc action
     QObject::connect(ffcButton1, SIGNAL(clicked()), lepton1, SLOT(performFFC()));
-    //connect snapshot button to the lepton1's snapshot action
+    // connect snapshot button to the lepton1's snapshot action
     QObject::connect(captureButton1, SIGNAL(clicked()), lepton1, SLOT(snapshot()));
-    //connect restart button to the lepton1's restart action
+    // connect restart button to the lepton1's restart action
     QObject::connect(restartButton1, SIGNAL(clicked()), lepton1, SLOT(restart()));
 
     qDebug() << "lepton1->start";
     lepton1->start();
 
+    qDebug() << "lepton2 setup";
+
     LeptonThread *lepton2 = new LeptonThread(0, 1); // /dev/i2c-0, /dev/spidev0.1
     QObject::connect(lepton2, SIGNAL(updateImage(QImage)), &label2, SLOT(setImage(QImage)));
-    //connect ffc button to the lepton2's ffc action
+    // connect ffc button to the lepton2's ffc action
     QObject::connect(ffcButton2, SIGNAL(clicked()), lepton2, SLOT(performFFC()));
-    //connect snapshot button to the lepton2's snapshot action
+    // connect snapshot button to the lepton2's snapshot action
     QObject::connect(captureButton2, SIGNAL(clicked()), lepton2, SLOT(snapshot()));
-    //connect restart button to the lepton2's restart action
+    // connect restart button to the lepton2's restart action
     QObject::connect(restartButton2, SIGNAL(clicked()), lepton2, SLOT(restart()));
 
     qDebug() << "lepton2->start";

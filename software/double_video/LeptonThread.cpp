@@ -22,6 +22,7 @@ static uint32_t speed = 20000000;
 int snapshotCount = 0;
 int frame = 0;
 static int raw [HEIGHT][WIDTH];
+const int *COLORMAP = colormap_grayscale;
 
 static void pabort(const char *s) {
 	perror(s);
@@ -94,7 +95,7 @@ void LeptonThread::run() {
                     }
                     continue;
                 } else {
-                    if(packetNumber == 20) {
+                    if (packetNumber == 20) {
                         // reads the "ttt" number
                         segmentNumber = result[(i*PACKETS_PER_SEGMENT+j)*PACKET_SIZE] >> 4;
                         // if it's not the segment expected reads again
@@ -143,28 +144,25 @@ void LeptonThread::run() {
 		float scale = 255/diff;
 		QRgb color;
 		
-		for(int k=0; k<FRAME_SIZE_UINT16; k++) {
-			if(k % PACKET_SIZE_UINT16 < 2) {
+		for (int k=0; k<FRAME_SIZE_UINT16; k++) {
+			if (k % PACKET_SIZE_UINT16 < 2) {
 				continue;
 			}
 		
 			value = (frameBuffer[k] - minValue) * scale;
 			
-			const int *colormap = colormap_grayscale;
-			color = qRgb(colormap[3*value], colormap[3*value+1], colormap[3*value+2]);
+			color = qRgb(COLORMAP[3*value], COLORMAP[3*value+1], COLORMAP[3*value+2]);
 			
-				if((k/PACKET_SIZE_UINT16) % 2 == 0){ // 1
+				if ((k/PACKET_SIZE_UINT16) % 2 == 0) { // 1
 					column = (k % PACKET_SIZE_UINT16 - 2);
-					row = (k / PACKET_SIZE_UINT16)/2;
-				}
-				else{ // 2
+					row    = (k / PACKET_SIZE_UINT16)/2;
+				} else { // 2
 					column = ((k % PACKET_SIZE_UINT16 - 2))+(PACKET_SIZE_UINT16-2);
 					row = (k / PACKET_SIZE_UINT16)/2;
 				}	
+
 				raw[row][column] = frameBuffer[k];
-								
 				myImage.setPixel(column, row, color);
-				
 		}
 
 		// Emit the signal for update

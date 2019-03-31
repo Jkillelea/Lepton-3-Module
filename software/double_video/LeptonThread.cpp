@@ -264,13 +264,16 @@ int LeptonThread::closeSPI() {
 }
 
 void LeptonThread::performFFC() {
+    qDebug() << "perform_ffc";
     i2c_port.perform_ffc();
 }
 
 void LeptonThread::enableRadiometry() {
+    qDebug() << "enable_radiometry";
     i2c_port.enable_radiometry();
 }
 
 void LeptonThread::restart() {
+    qDebug() << "restart";
     i2c_port.restart();
 }

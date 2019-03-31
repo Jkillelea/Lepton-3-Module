@@ -25,9 +25,11 @@ int LeptonI2CClass::connect() {
 
 int LeptonI2CClass::enable_radiometry() {
     if (!this->_connected)
-        connect();
+        if(connect() != LEP_OK)
+            return -1;
 
     LEP_RESULT res = LEP_SetRadEnableState(this->_port, LEP_RAD_ENABLE);
+
     if (res != LEP_OK) {
         qDebug() << "Failed to enable radiometry";
         qDebug() << "error code: " << error_as_string(res) << "";

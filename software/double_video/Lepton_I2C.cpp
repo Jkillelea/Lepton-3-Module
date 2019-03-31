@@ -1,14 +1,6 @@
 #include <QtDebug>
-#include <stdio.h>
-#include <stdbool.h>
+
 #include "Lepton_I2C.h"
-#include "lepton-sdk-fork/LEPTON_SDK.h"
-#include "lepton-sdk-fork/LEPTON_ErrorCodes.h"
-#include "lepton-sdk-fork/LEPTON_SYS.h"
-#include "lepton-sdk-fork/LEPTON_Types.h"
-#include "lepton-sdk-fork/LEPTON_AGC.h"
-#include "lepton-sdk-fork/LEPTON_RAD.h"
-#include "lepton-sdk-fork/LEPTON_OEM.h"
 
 bool _connected = false;
 

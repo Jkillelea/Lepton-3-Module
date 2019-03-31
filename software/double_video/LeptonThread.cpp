@@ -73,7 +73,7 @@ void LeptonThread::run() {
                 size_t offset = sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j);
                 size_t nbytes = read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
                 // assert(nbytes == sizeof(uint8_t)*PACKET_SIZE);
-                if (nbytes == sizeof(uint8_t)*PACKET_SIZE) {
+                if (nbytes != sizeof(uint8_t)*PACKET_SIZE) {
                     qDebug() << "Didn't read enough data: " << nbytes 
                              << "/" 
                              << sizeof(uint8_t)*PACKET_SIZE;

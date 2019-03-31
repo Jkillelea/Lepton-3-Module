@@ -37,6 +37,7 @@ LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
     qDebug() << "LeptonThread()";
     this->i2c_num = i2c_num;
     this->spi_num = spi_num;
+    this->i2c_port = LeptonI2CClass(this->i2c_num);
     this->enableRadiometry();
     this->openSPI(spi_num);
 }
@@ -262,16 +263,14 @@ int LeptonThread::closeSPI() {
     return result;
 }
 
-
-// perform FFC
 void LeptonThread::performFFC() {
-	lepton_perform_ffc();
+    i2c_port.perform_ffc();
 }
 
 void LeptonThread::enableRadiometry() {
-	lepton_enable_radiometry();
+    i2c_port.enable_radiometry();
 }
 
 void LeptonThread::restart() {
-	lepton_restart();
+    i2c_port.restart();
 }

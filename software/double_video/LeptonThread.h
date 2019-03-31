@@ -2,6 +2,7 @@
 #define TEXTTHREAD
 
 #include <ctime>
+#include <cstdlib>
 #include <stdint.h>
 
 #include <QThread>
@@ -11,8 +12,8 @@
 #include <QString>
 #include <iostream>
 #include <QPainter>
-#include <cstdlib>
 
+#include <LeptonI2CClass.h>
 
 #define WIDTH  (160)
 #define HEIGHT (120)
@@ -56,6 +57,8 @@ private:
 
   int i2c_num, spi_num;
   int fd;
+
+  LeptonI2CClass i2c_port;
 
 };
 

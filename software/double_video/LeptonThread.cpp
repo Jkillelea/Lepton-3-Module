@@ -37,9 +37,6 @@ LeptonThread::LeptonThread(int i2c_num, int spi_num) : QThread() {
     qDebug() << "LeptonThread()";
     this->i2c_num = i2c_num;
     this->spi_num = spi_num;
-    this->i2c_port = LeptonI2CClass(this->i2c_num);
-    this->enableRadiometry();
-    this->openSPI(spi_num);
 }
 
 LeptonThread::~LeptonThread() {
@@ -49,6 +46,10 @@ LeptonThread::~LeptonThread() {
 
 void LeptonThread::run() {
     qDebug() << "run()";
+
+    this->i2c_port = LeptonI2CClass(this->i2c_num);
+    this->enableRadiometry();
+    this->openSPI(spi_num);
 
 	// create the initial image
 	QRgb red = qRgb(255, 0, 0);

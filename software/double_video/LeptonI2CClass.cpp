@@ -4,6 +4,7 @@
 static int tries = 5;
 
 LeptonI2CClass::LeptonI2CClass(int i2c_num) {
+    qDebug() << "LeptonI2CClass(" << i2c_num << ")";
     this->_i2c_num = i2c_num;
 
     for (int i = 0; i < tries; i++) {
@@ -13,6 +14,7 @@ LeptonI2CClass::LeptonI2CClass(int i2c_num) {
 }
 
 int LeptonI2CClass::connect() {
+    qDebug() << "connect";
 	LEP_RESULT res = LEP_OpenPort(this->_i2c_num, LEP_CCI_TWI, 400, this->_port);
 
     if (res != LEP_OK)
@@ -24,6 +26,7 @@ int LeptonI2CClass::connect() {
 }
 
 int LeptonI2CClass::enable_radiometry() {
+    qDebug() << "enable_radiometry";
     if (!this->_connected)
         if(connect() != LEP_OK)
             return -1;
@@ -38,6 +41,7 @@ int LeptonI2CClass::enable_radiometry() {
 }
 
 int LeptonI2CClass::temperature() {
+    qDebug() << "temperature";
     LEP_SYS_FPA_TEMPERATURE_KELVIN_T fpa_temp_kelvin;
 
 	if(!this->_connected)
@@ -70,6 +74,7 @@ int LeptonI2CClass::perform_ffc() {
 }
 
 int LeptonI2CClass::restart() {
+    qDebug() << "restart";
 	if(!this->_connected) {
 		if (connect() != LEP_OK)
 			qDebug() << "I2C could not connect";

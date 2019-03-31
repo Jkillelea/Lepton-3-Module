@@ -16,12 +16,12 @@
 #include <linux/spi/spidev.h>
 
 
-uint8_t mode = SPI_MODE_3;
-static uint8_t bits = 8;
-static uint32_t speed = 20000000;
-int snapshotCount = 0;
-int frame = 0;
-static int raw [HEIGHT][WIDTH];
+static int       raw[HEIGHT][WIDTH];
+static uint32_t  speed = 20000000;
+static uint8_t   bits  = 8;
+int     frame          = 0;
+int     snapshotCount  = 0;
+uint8_t mode           = SPI_MODE_3;
 
 static void pabort(const char *s) {
 	perror(s);
@@ -72,7 +72,7 @@ void LeptonThread::run() {
                 size_t offset = sizeof(uint8_t)*PACKET_SIZE*(i*PACKETS_PER_SEGMENT+j);
                 size_t nbytes = read(this->fd, result+offset, sizeof(uint8_t)*PACKET_SIZE);
                 // assert(nbytes == sizeof(uint8_t)*PACKET_SIZE);
-                if (nbytes == sizeof(uint8_t)*PACKET_SIZE) {
+                if (nbytes != sizeof(uint8_t)*PACKET_SIZE) {
                     qDebug() << "Didn't read enough data: " << nbytes 
                              << "/" 
                              << sizeof(uint8_t)*PACKET_SIZE;

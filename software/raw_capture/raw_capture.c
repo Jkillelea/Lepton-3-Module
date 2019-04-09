@@ -50,6 +50,7 @@ void read_image(uint16_t *data_ptr) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
+
             if ((packet[0] & 0x0f) == 0x0f) { // handle drop packets
                 LOG("drop (%x)\n", packet[0]);
                 pak--;
@@ -57,16 +58,18 @@ void read_image(uint16_t *data_ptr) {
             } 
 
             // get segment and packet number
-            segment_number = (packet[0] >> 4) & 0b00000111;
+            segment_number = (packet[0] >> 4);
             packet_number  = packet[1];
+            LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet_number);
 
-            LOG("expected packet %d.%d got %d.%d\n", seg, pak,
-                                                     segment_number, packet_number);
+            if (0 <= packet[1] && packet[1] < PACKETS_PER_SEGMENT)
+                pak  = packet[1];
 
             if (pak != packet_number) { // out of sync
                 LOG("mismatch %d\n", mismatches);
                 pak = -1;
                 mismatches++;
+                usleep(1000);
                 if (mismatches == 100) {
                     mismatches = 0;
                     close(spi_fd);
@@ -78,15 +81,16 @@ void read_image(uint16_t *data_ptr) {
 
             // segment number is only valid on packet 20
             if (pak == 20) {
-                LOG("expected segment %d, resetting to %d\n", seg, segment_number);
-                if (segment_number == 1)
-                    seg = segment_number; 
-                // if (1 <= segment_number && segment_number <= NUM_SEGMENTS)
-                //     seg = segment_number;
+                LOG("Expected segment %d, got %d\n", seg, segment_number);
 
-                // EXPERIMENTAL
-                if (segment_number != (seg+1)%4)
-                    pak = -1;
+                if (segment_number == 0) {
+                    LOG("Invalid segment number. Going back to 1\n");
+                    seg = 1; 
+                    continue;
+                } else if (1 <= segment_number && segment_number <= NUM_SEGMENTS) {
+                    LOG("Resetting segment number.\n");
+                    seg = segment_number;
+                }
             }
 
             // Copy the image data from the SPI packet
@@ -144,10 +148,10 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // Read the image
-    for (int i = 0; i < 50; i++) {
-        read_image(image_ptr);
-    }
-    // read_image(image_ptr);
+    // for (int i = 0; i < 10; i++) {
+    //     read_image(image_ptr);
+    // }
+    read_image(image_ptr);
 
     // Print to stdout
     for (int i = 0; i < IMAGE_HEIGHT; i++) {

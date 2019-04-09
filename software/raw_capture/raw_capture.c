@@ -92,6 +92,7 @@ void read_image(uint16_t *data_ptr) {
                 data_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];
             }
         }
+        usleep(1000/106);
     }
 }
 

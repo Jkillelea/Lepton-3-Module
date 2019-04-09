@@ -83,6 +83,10 @@ void read_image(uint16_t *data_ptr) {
                     seg = segment_number; 
                 // if (1 <= segment_number && segment_number <= NUM_SEGMENTS)
                 //     seg = segment_number;
+
+                // EXPERIMENTAL
+                if (segment_number != (seg+1)%4)
+                    pak = -1;
             }
 
             // Copy the image data from the SPI packet

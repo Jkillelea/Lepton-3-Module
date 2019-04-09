@@ -60,7 +60,8 @@ void read_image(uint16_t *data_ptr) {
             segment_number = (packet[0] >> 4) & 0b00000111;
             packet_number  = packet[1];
 
-            LOG("expected packet %d got %d\n", pak, packet_number);
+            LOG("expected packet %d.%d got %d.%d\n", seg, pak,
+                                                     segment_number, packet_number);
 
             if (pak != packet_number) { // out of sync
                 LOG("mismatch %d\n", mismatches);
@@ -78,8 +79,10 @@ void read_image(uint16_t *data_ptr) {
             // segment number is only valid on packet 20
             if (pak == 20) {
                 LOG("expected segment %d, resetting to %d\n", seg, segment_number);
-                if (1 <= segment_number && segment_number <= NUM_SEGMENTS)
+                if (segment_number == 1)
                     seg = segment_number; 
+                // if (1 <= segment_number && segment_number <= NUM_SEGMENTS)
+                //     seg = segment_number;
             }
 
             // Copy the image data from the SPI packet
@@ -137,7 +140,7 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // Read the image
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 50; i++) {
         read_image(image_ptr);
     }
     // read_image(image_ptr);

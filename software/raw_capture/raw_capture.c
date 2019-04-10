@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <fcntl.h>
+#include <stdbool.h>
 #include <stdint.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -39,6 +40,10 @@ uint8_t spi_bits_per_word = 8;
 // SPI communication vars
 uint8_t packet[PACKET_SIZE] = {0x0};
 
+inline static bool is_valid(uint8_t data) {
+    return (data & 0x0f) == 0x0f;
+}
+
 void read_image(uint16_t *data_ptr) {
     static uint32_t mismatches = 0; // number of times gotten out of sync
     uint8_t segment_number     = 0; // segment number from SPI packet
@@ -51,11 +56,11 @@ void read_image(uint16_t *data_ptr) {
                 LOG("SPI failed to read enough bytes!\n");
 
 
-            if ((packet[0] & 0x0f) == 0x0f) { // handle drop packets
+            if (is_valid(packet[0])) { // handle drop packets
                 LOG("drop (%x)\n", packet[0]);
                 pak--;
                 continue;
-            } 
+            }
 
             // get segment and packet number
             segment_number = (packet[0] >> 4);
@@ -85,7 +90,7 @@ void read_image(uint16_t *data_ptr) {
 
                 if (segment_number == 0) {
                     LOG("Invalid segment number. Going back to 1\n");
-                    seg = 1; 
+                    seg = 1;
                     continue;
                 } else if (1 <= segment_number && segment_number <= NUM_SEGMENTS) {
                     LOG("Resetting segment number.\n");
@@ -95,7 +100,7 @@ void read_image(uint16_t *data_ptr) {
 
             // Copy the image data from the SPI packet
             // Can't use a straight memcpy since we have to account for endianness
-            // when copying over. Lepton SPI is big endian and the pi's armv7l 
+            // when copying over. Lepton SPI is big endian and the pi's armv7l
             // processor is little endian
             size_t offset = 80*pak + 60*80*(seg-1);
             for (int i = 0; i < 80; i++) {
@@ -148,10 +153,9 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // Read the image
-    // for (int i = 0; i < 10; i++) {
-    //     read_image(image_ptr);
-    // }
-    read_image(image_ptr);
+    for (int i = 0; i < 1; i++) {
+        read_image(image_ptr);
+    }
 
     // Print to stdout
     for (int i = 0; i < IMAGE_HEIGHT; i++) {

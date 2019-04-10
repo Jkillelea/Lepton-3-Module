@@ -20,6 +20,7 @@
 #include "util.h"
 #include "global_vars.h"
 
+// #define LOG(...)
 #define LOG(...) fprintf(stderr, __VA_ARGS__)
 
 // Image
@@ -55,7 +56,6 @@ void read_image(uint16_t *data_ptr) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
-
             if (is_valid(packet[0])) { // handle drop packets
                 LOG("drop (%x)\n", packet[0]);
                 pak--;
@@ -65,6 +65,7 @@ void read_image(uint16_t *data_ptr) {
             // get segment and packet number
             segment_number = (packet[0] >> 4);
             packet_number  = packet[1];
+
             LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet_number);
 
             if (0 <= packet[1] && packet[1] < PACKETS_PER_SEGMENT)
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
 
     // parse opts
     if (argc < 3) {
-        LOG("Usage: %s i2c-number spi-number\n", argv[0]);
+        fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
         return -1;
     }
 

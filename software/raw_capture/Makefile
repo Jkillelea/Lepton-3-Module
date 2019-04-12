@@ -13,7 +13,7 @@ EXEC = raw_capture
 
 OUTDIR = Build
 
-OBJS = $(OUTDIR)/raw_capture.o $(OUTDIR)/util.o 
+OBJS = $(OUTDIR)/raw_capture.o $(OUTDIR)/util.o  $(OUTDIR)/packet.o $(OUTDIR)/segment.o
 
 .PHONY: all
 all: $(EXEC)

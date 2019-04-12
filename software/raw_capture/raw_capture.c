@@ -41,10 +41,6 @@ uint8_t spi_bits_per_word = 8;
 // SPI communication vars
 uint8_t packet[PACKET_SIZE] = {0x0};
 
-inline static bool is_valid(uint8_t data) {
-    return (data & 0x0f) == 0x0f;
-}
-
 void read_image(uint16_t *data_ptr) {
     static uint32_t mismatches = 0; // number of times gotten out of sync
     uint8_t segment_number     = 0; // segment number from SPI packet
@@ -56,7 +52,7 @@ void read_image(uint16_t *data_ptr) {
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
-            if (is_valid(packet[0])) { // handle drop packets
+            if ((data_ptr[0] & 0x0F) == 0x0F) { // handle drop packets
                 LOG("drop (%x)\n", packet[0]);
                 pak--;
                 continue;

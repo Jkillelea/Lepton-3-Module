@@ -1,3 +1,4 @@
+// part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
 #ifndef SEGMENT_H_
 #define SEGMENT_H_
 

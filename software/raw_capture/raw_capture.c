@@ -3,6 +3,7 @@
 // 'image' is a grid of numbers in text form
 // returns 0 on success
 // returns -1 if not all image segments are in order
+// part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>

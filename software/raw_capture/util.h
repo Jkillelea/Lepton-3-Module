@@ -1,3 +1,4 @@
+// part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
 #ifndef _RAW_CAPTURE_UTIL_H_
 #define _RAW_CAPTURE_UTIL_H_
 

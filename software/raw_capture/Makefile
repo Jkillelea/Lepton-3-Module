@@ -1,3 +1,4 @@
+# part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
 CC = gcc
 
 CFLAGS = -Wall

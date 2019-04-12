@@ -1,3 +1,4 @@
+// part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
 #ifndef PACKET_H_
 #define PACKET_H_
 #include <stdint.h>

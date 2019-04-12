@@ -19,6 +19,8 @@
 
 #include "util.h"
 #include "global_vars.h"
+#include "packet.h"
+#include "segment.h"
 
 // #define LOG(...)
 #define LOG(...) fprintf(stderr, __VA_ARGS__)
@@ -41,31 +43,38 @@ uint8_t spi_bits_per_word = 8;
 // SPI communication vars
 uint8_t packet[PACKET_SIZE] = {0x0};
 
+segment_t segments[4];
+
 void read_image(uint16_t *data_ptr) {
-    static uint32_t mismatches = 0; // number of times gotten out of sync
-    uint8_t segment_number     = 0; // segment number from SPI packet
-    int16_t packet_number      = 0; // packet number from SPI packet
+    static uint32_t mismatches     = 0; // number of times gotten out of sync
+            uint8_t segment_number = 0; // segment number from SPI packet
+            int16_t packet_number  = 0; // packet number from SPI packet
 
     for (int32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (int32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 
+            segment_t *segment_ptr = &(segments[seg-1]);
+            packet_t  *packet_ptr  = &(segment_ptr->packets[pak]);
+
             if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
-            if ((data_ptr[0] & 0x0F) == 0x0F) { // handle drop packets
+            // parse the bytes into a packet_t struct
+            packet_parse(packet, packet_ptr);
+
+            if (!packet_ptr->valid) { // handle drop packets
                 LOG("drop (%x)\n", packet[0]);
                 pak--;
                 continue;
             }
 
-            // get segment and packet number
-            segment_number = (packet[0] >> 4);
-            packet_number  = packet[1];
+            packet_number  = packet_ptr->packet_no;
+            segment_number = packet_ptr->packet_no;
 
             LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet_number);
 
-            if (0 <= packet[1] && packet[1] < PACKETS_PER_SEGMENT)
-                pak  = packet[1];
+            if (0 <= packet_number && packet_number < PACKETS_PER_SEGMENT)
+                pak  = packet_number;
 
             if (pak != packet_number) { // out of sync
                 LOG("mismatch %d\n", mismatches);
@@ -73,6 +82,7 @@ void read_image(uint16_t *data_ptr) {
                 mismatches++;
                 usleep(1000);
                 if (mismatches == 100) {
+                    LOG("100 mismatches - resetting\n");
                     mismatches = 0;
                     close(spi_fd);
                     usleep(200*1000);
@@ -82,7 +92,7 @@ void read_image(uint16_t *data_ptr) {
             }
 
             // segment number is only valid on packet 20
-            if (pak == 20) {
+            if (segment_number == 20) {
                 LOG("Expected segment %d, got %d\n", seg, segment_number);
 
                 if (segment_number == 0) {
@@ -93,16 +103,6 @@ void read_image(uint16_t *data_ptr) {
                     LOG("Resetting segment number.\n");
                     seg = segment_number;
                 }
-            }
-
-            // Copy the image data from the SPI packet
-            // Can't use a straight memcpy since we have to account for endianness
-            // when copying over. Lepton SPI is big endian and the pi's armv7l
-            // processor is little endian
-            size_t offset = 80*pak + 60*80*(seg-1);
-            for (int i = 0; i < 80; i++) {
-                size_t idx = 2*i + 4;
-                data_ptr[offset + i] = packet[idx] << 8 | packet[idx + 1];
             }
         }
         usleep(1000/106);
@@ -154,12 +154,16 @@ int main(int argc, char *argv[]) {
         read_image(image_ptr);
     }
 
-    // Print to stdout
-    for (int i = 0; i < IMAGE_HEIGHT; i++) {
-        for (int j = 0; j < IMAGE_WIDTH; j++) {
-            printf("%d ", image[i][j]);
+    for (unsigned int seg = 0; seg < 4; seg++) {
+        segment_t *segment = &segments[seg];
+        for (unsigned int pak = 0; pak < 60; pak++) {
+            packet_t *packet = &segment->packets[pak];
+            for (unsigned int i = 0; i < 80; i++) {
+                printf("%d", packet->data[i]);
+            }
+            if (pak % 2 == 1)
+                printf("\n");
         }
-        printf("\n");
     }
 
     return 0;

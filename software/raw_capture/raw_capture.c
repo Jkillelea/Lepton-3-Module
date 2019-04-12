@@ -25,10 +25,6 @@
 // #define LOG(...)
 #define LOG(...) fprintf(stderr, __VA_ARGS__)
 
-// Image
-uint16_t  image[IMAGE_HEIGHT][IMAGE_WIDTH];
-uint16_t *image_ptr  = *image;
-
 // I2C vars
 uint16_t i2c_number = -1;
 LEP_CAMERA_PORT_DESC_T i2c_port;
@@ -41,42 +37,36 @@ char    spi_path[255];
 uint8_t spi_bits_per_word = 8;
 
 // SPI communication vars
-uint8_t packet[PACKET_SIZE] = {0x0};
+uint8_t spi_data[PACKET_SIZE] = {0x0};
 
+// Image is made of 4 segments that are each made of 60 packets
 segment_t segments[4];
 
-void read_image(uint16_t *data_ptr) {
-    static uint32_t mismatches     = 0; // number of times gotten out of sync
-            uint8_t segment_number = 0; // segment number from SPI packet
-            int16_t packet_number  = 0; // packet number from SPI packet
+void read_image() {
+    uint32_t mismatches    = 0; // number of times gotten out of sync
+    packet_t packet;
 
     for (int32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (int32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
 
-            segment_t *segment_ptr = &(segments[seg-1]);
-            packet_t  *packet_ptr  = &(segment_ptr->packets[pak]);
-
-            if (read(spi_fd, packet, PACKET_SIZE) != PACKET_SIZE) // Read SPI
+            if (read(spi_fd, spi_data, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
             // parse the bytes into a packet_t struct
-            packet_parse(packet, packet_ptr);
+            packet_parse(spi_data, &packet); // NOTE: memory copy
 
-            if (!packet_ptr->valid) { // handle drop packets
-                LOG("drop (%x)\n", packet[0]);
+            if (!packet.valid) { // handle drop packets
+                LOG("drop (%x)\n", spi_data[0]);
                 pak--;
                 continue;
             }
 
-            packet_number  = packet_ptr->packet_no;
-            segment_number = packet_ptr->packet_no;
+            LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet.packet_no);
 
-            LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet_number);
+            if (0 <= packet.packet_no && packet.packet_no < PACKETS_PER_SEGMENT)
+                pak  = packet.packet_no;
 
-            if (0 <= packet_number && packet_number < PACKETS_PER_SEGMENT)
-                pak  = packet_number;
-
-            if (pak != packet_number) { // out of sync
+            if (pak != packet.packet_no) { // out of sync
                 LOG("mismatch %d\n", mismatches);
                 pak = -1;
                 mismatches++;
@@ -92,18 +82,19 @@ void read_image(uint16_t *data_ptr) {
             }
 
             // segment number is only valid on packet 20
-            if (segment_number == 20) {
-                LOG("Expected segment %d, got %d\n", seg, segment_number);
-
-                if (segment_number == 0) {
+            if (packet.segment_no == 20) {
+                LOG("Expected segment %d, got %d\n", seg, packet.segment_no);
+                if (packet.segment_no == 0) {
                     LOG("Invalid segment number. Going back to 1\n");
                     seg = 1;
                     continue;
-                } else if (1 <= segment_number && segment_number <= NUM_SEGMENTS) {
+                } else if (1 <= packet.segment_no && packet.segment_no <= NUM_SEGMENTS) {
                     LOG("Resetting segment number.\n");
-                    seg = segment_number;
+                    seg = packet.segment_no;
                 }
             }
+
+            segments[seg-1].packets[pak] = packet; // NOTE: memory copy
         }
         usleep(1000/106);
     }
@@ -111,7 +102,6 @@ void read_image(uint16_t *data_ptr) {
 
 int main(int argc, char *argv[]) {
     // setup
-    memset(image_ptr, 0, IMAGE_HEIGHT*IMAGE_WIDTH*sizeof(uint16_t));
 
     // parse opts
     if (argc < 3) {
@@ -151,7 +141,7 @@ int main(int argc, char *argv[]) {
 
     // Read the image
     for (int i = 0; i < 1; i++) {
-        read_image(image_ptr);
+        read_image();
     }
 
     for (unsigned int seg = 0; seg < 4; seg++) {

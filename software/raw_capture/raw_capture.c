@@ -43,30 +43,33 @@ uint8_t spi_data[PACKET_SIZE] = {0x0};
 segment_t segments[4];
 
 void read_image() {
-    uint32_t mismatches    = 0; // number of times gotten out of sync
-    packet_t packet;
+    uint32_t mismatches = 0; // number of times gotten out of sync
+
+    segment_t segment;
 
     for (int32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (int32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
+
+            packet_t *packet_ptr = &segment.packets[pak];
 
             if (read(spi_fd, spi_data, PACKET_SIZE) != PACKET_SIZE) // Read SPI
                 LOG("SPI failed to read enough bytes!\n");
 
             // parse the bytes into a packet_t struct
-            packet_parse(spi_data, &packet); // NOTE: memory copy
+            packet_parse(spi_data, packet_ptr); // NOTE: memory copy
 
-            if (!packet.valid) { // handle drop packets
+            if (!packet_ptr->valid) { // handle drop packets
                 LOG("drop (%x)\n", spi_data[0]);
                 pak--;
                 continue;
             }
 
-            LOG("expected packet %d.%2d got x.%2d\n", seg, pak, packet.packet_no);
+            LOG("expected %d.%2d got %d.%2d\n", seg, pak, packet_ptr->segment_no, packet_ptr->packet_no);
 
-            if (0 <= packet.packet_no && packet.packet_no < PACKETS_PER_SEGMENT)
-                pak  = packet.packet_no;
+            if (0 <= packet_ptr->packet_no && packet_ptr->packet_no < PACKETS_PER_SEGMENT)
+                pak  = packet_ptr->packet_no;
 
-            if (pak != packet.packet_no) { // out of sync
+            if (pak != packet_ptr->packet_no) { // out of sync
                 LOG("mismatch %d\n", mismatches);
                 pak = -1;
                 mismatches++;
@@ -82,19 +85,20 @@ void read_image() {
             }
 
             // segment number is only valid on packet 20
-            if (packet.segment_no == 20) {
-                LOG("Expected segment %d, got %d\n", seg, packet.segment_no);
-                if (packet.segment_no == 0) {
+            if (packet_ptr->packet_no == 20) {
+                LOG("Expected segment %d, got %d\n", seg, packet_ptr->segment_no);
+                if (packet_ptr->segment_no == 0) {
                     LOG("Invalid segment number. Going back to 1\n");
                     seg = 1;
                     continue;
-                } else if (1 <= packet.segment_no && packet.segment_no <= NUM_SEGMENTS) {
+                } else if (1 <= packet_ptr->segment_no && packet_ptr->segment_no <= NUM_SEGMENTS) {
                     LOG("Resetting segment number.\n");
-                    seg = packet.segment_no;
+                    seg                = packet_ptr->segment_no;
+                    segment.segment_no = packet_ptr->segment_no;
                 }
             }
 
-            segments[seg-1].packets[pak] = packet; // NOTE: memory copy
+            segments[seg-1] = segment; // NOTE: memory copy
         }
         usleep(1000/106);
     }
@@ -144,19 +148,39 @@ int main(int argc, char *argv[]) {
         read_image();
     }
 
+    LOG("Got segment numbers ");
+    for (unsigned int seg = 0; seg < 4; seg++)
+        LOG("%d ", segments[seg].segment_no);
+    LOG("\n");
+
+    // Do we have every segment in the right order
+    bool transmission_ok = true;
+    for (unsigned int seg = 0; seg < 4; seg++)
+        transmission_ok = transmission_ok && (segments[seg].segment_no == seg+1);
+
+    if (transmission_ok) {
+        LOG("OK\n");
+        // printf("OK\n");
+    } else {
+        LOG("ERROR\n");
+        // printf("ERROR\n");
+    }
+
     for (unsigned int seg = 0; seg < 4; seg++) {
         segment_t *segment = &segments[seg];
         for (unsigned int pak = 0; pak < 60; pak++) {
             packet_t *packet = &segment->packets[pak];
             for (unsigned int i = 0; i < 80; i++) {
-                printf("%d", packet->data[i]);
+                printf("%d ", packet->data[i]);
             }
             if (pak % 2 == 1)
                 printf("\n");
         }
     }
 
-    return 0;
+    if (transmission_ok)
+        return 0;
+    return -1;
 }
 
 

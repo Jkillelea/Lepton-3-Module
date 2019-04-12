@@ -1,3 +1,8 @@
+// A utility for capturing raw images from a FLIR Lepton 3.5
+// call like: ./raw_capture 1 0 > image &&  ../../scripts/parse_txt_image.py image
+// 'image' is a grid of numbers in text form
+// returns 0 on success
+// returns -1 if not all image segments are in order
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>

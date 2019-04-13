@@ -50,12 +50,10 @@ segment_t segments[4];
 
 void read_image() {
     uint32_t mismatches = 0; // number of times gotten out of sync
-
     segment_t segment;
 
     for (int32_t seg = 1; seg <= NUM_SEGMENTS; seg++) {
         for (int32_t pak = 0; pak < PACKETS_PER_SEGMENT; pak++) {
-
             packet_t *packet_ptr = &segment.packets[pak];
 
             if (read(spi_fd, spi_data, PACKET_SIZE) != PACKET_SIZE) // Read SPI

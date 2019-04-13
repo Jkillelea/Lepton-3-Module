@@ -70,7 +70,9 @@ void read_image() {
                 continue;
             }
 
-            LOG("expected %d.%2d got %d.%2d\n", seg, pak, packet_ptr->segment_no, packet_ptr->packet_no);
+            LOG("expected %d.%2d got %d.%2d\n", seg, pak,
+                                                packet_ptr->segment_no,
+                                                packet_ptr->packet_no);
 
             if (0 <= packet_ptr->packet_no && packet_ptr->packet_no < PACKETS_PER_SEGMENT)
                 pak  = packet_ptr->packet_no;
@@ -97,7 +99,8 @@ void read_image() {
                     LOG("Invalid segment number. Going back to 1\n");
                     seg = 1;
                     continue;
-                } else if (1 <= packet_ptr->segment_no && packet_ptr->segment_no <= NUM_SEGMENTS) {
+                } else if (1 <= packet_ptr->segment_no
+                             && packet_ptr->segment_no <= NUM_SEGMENTS) {
                     LOG("Resetting segment number.\n");
                     seg                = packet_ptr->segment_no;
                     segment.segment_no = packet_ptr->segment_no;
@@ -163,11 +166,10 @@ int main(int argc, char *argv[]) {
     for (uint32_t seg = 0; seg < 4; seg++)
         transmission_ok = transmission_ok && (segments[seg].segment_no == seg+1);
 
-    if (transmission_ok) {
+    if (transmission_ok)
         LOG("OK\n");
-    } else {
+    else
         LOG("ERROR\n");
-    }
 
     for (uint32_t seg = 0; seg < 4; seg++) {
         segment_t *segment = &segments[seg];

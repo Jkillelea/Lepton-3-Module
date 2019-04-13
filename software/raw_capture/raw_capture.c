@@ -112,7 +112,6 @@ void read_image() {
 
 int main(int argc, char *argv[]) {
     // setup
-
     // parse opts
     if (argc < 3) {
         fprintf(stderr, "Usage: %s i2c-number spi-number\n", argv[0]);
@@ -150,33 +149,31 @@ int main(int argc, char *argv[]) {
     spi_fd = open_spi_port(spi_path);
 
     // Read the image
-    for (int i = 0; i < 1; i++) {
+    for (uint32_t i = 0; i < 1; i++) {
         read_image();
     }
 
     LOG("Got segment numbers ");
-    for (unsigned int seg = 0; seg < 4; seg++)
+    for (uint32_t seg = 0; seg < 4; seg++)
         LOG("%d ", segments[seg].segment_no);
     LOG("\n");
 
     // Do we have every segment in the right order
     bool transmission_ok = true;
-    for (unsigned int seg = 0; seg < 4; seg++)
+    for (uint32_t seg = 0; seg < 4; seg++)
         transmission_ok = transmission_ok && (segments[seg].segment_no == seg+1);
 
     if (transmission_ok) {
         LOG("OK\n");
-        // printf("OK\n");
     } else {
         LOG("ERROR\n");
-        // printf("ERROR\n");
     }
 
-    for (unsigned int seg = 0; seg < 4; seg++) {
+    for (uint32_t seg = 0; seg < 4; seg++) {
         segment_t *segment = &segments[seg];
-        for (unsigned int pak = 0; pak < 60; pak++) {
+        for (uint32_t pak = 0; pak < 60; pak++) {
             packet_t *packet = &segment->packets[pak];
-            for (unsigned int i = 0; i < 80; i++) {
+            for (uint32_t i = 0; i < 80; i++) {
                 printf("%d ", packet->data[i]);
             }
             if (pak % 2 == 1)

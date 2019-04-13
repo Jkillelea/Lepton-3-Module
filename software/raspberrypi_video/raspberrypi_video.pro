@@ -9,8 +9,8 @@ LEPTONSDK = lepton-sdk-fork
 
 PRE_TARGETDEPS += sdk
 QMAKE_EXTRA_TARGETS += sdk sdkclean
-sdk.commands = make -C $${RPI_LIBS}/$${LEPTONSDK}
-sdkclean.commands = make -C $${RPI_LIBS}/$${LEPTONSDK} clean
+sdk.commands = $(MAKE) -C $${RPI_LIBS}/$${LEPTONSDK}
+sdkclean.commands = $(MAKE) -C $${RPI_LIBS}/$${LEPTONSDK} clean
 
 DEPENDPATH += .
 INCLUDEPATH += . $${RPI_LIBS}

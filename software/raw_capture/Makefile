@@ -1,7 +1,7 @@
 # part of raw_capture. Copyright 2019 Jacob Killelea <jkillelea@protonmail.ch>
-CC = gcc
 
-CFLAGS = -Wall
+CC = gcc
+CFLAGS = -Wall -march=native
 CFLAGS += -O3
 # CFLAGS += -g
 

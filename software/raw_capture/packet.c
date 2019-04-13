@@ -11,7 +11,7 @@ void packet_parse(uint8_t *raw_data, packet_t *packet) {
     else
         packet->segment_no = -1;
 
-    for (int i = 0; i < 80; i++) {
+    for (uint32_t i = 0; i < 80; i++) {
         size_t idx = 2*i + 4;
         packet->data[i] = (raw_data[idx] << 8) | raw_data[idx+1];
     }

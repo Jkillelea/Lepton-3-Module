@@ -5,7 +5,7 @@
 #include "packet.h"
 
 typedef struct segment {
-    unsigned int segment_no;
+    uint32_t segment_no;
     packet_t packets[60];
 } segment_t;
 

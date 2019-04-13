@@ -29,7 +29,7 @@ $(OUTDIR):
 	mkdir -p $@
 
 $(SDK_LIB):
-	make -C $(LIB_PATH)
+	$(MAKE) -C $(LIB_PATH)
 
 .PHONY: clean
 clean:
@@ -38,4 +38,4 @@ clean:
 
 .PHONY: sdkclean
 sdkclean:
-	make clean -C $(LIB_PATH)
+	$(MAKE) clean -C $(LIB_PATH)

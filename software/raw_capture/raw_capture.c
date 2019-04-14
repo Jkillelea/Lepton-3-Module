@@ -164,6 +164,22 @@ int main(int argc, char *argv[]) {
     for (uint32_t seg = 0; seg < 4; seg++)
         transmission_ok = transmission_ok && (segments[seg].segment_no == seg+1);
 
+    bool no_zeros = true;
+    for (uint32_t seg = 0; seg < 4; seg++) {
+        segment_t *segment = &segments[seg];
+        for (uint32_t pak = 0; pak < 60; pak++) {
+            packet_t *packet = &segment->packets[pak];
+            for (uint32_t i = 0; i < 80; i++) {
+                no_zeros = no_zeros && !(packet->data[i] == 0);
+            }
+        }
+    }
+
+    if (no_zeros)
+        LOG("Some pixels were zero\n");
+    else
+        LOG("Picture looks good...\n");
+
     if (transmission_ok)
         LOG("OK\n");
     else

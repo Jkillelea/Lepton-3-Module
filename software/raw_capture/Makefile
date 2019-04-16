@@ -22,6 +22,10 @@ all: $(EXEC)
 $(EXEC): $(OUTDIR) $(OBJS) $(SDK_LIB)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(SDK_LIB)
 
+restart_camera: $(OUTDIR) restart_camera.c  $(SDK_LIB)
+	$(CC) $(CFLAGS) -o $@ restart_camera.c $(SDK_LIB)
+
+
 $(OUTDIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 
